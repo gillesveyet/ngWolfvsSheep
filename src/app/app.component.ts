@@ -1,16 +1,48 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'ngWolfvsSheep';
-  status = 'status line';
-  debug = 'debug line';
+    title = 'ngWolfvsSheep';
+    status = 'status line';
+    debug = 'debug line';
 
 
-  settings = { wolfDepth : 12, sheepDepth : 12};
+    showMenuPlay = true;
+    showMenuAutoPlay = false;
+    showMenuGame = false;
+    settings = { wolfDepth: 12, sheepDepth: 12 };
+
+
+    onPlaySheep() {
+    }
+
+    onPlayWolf() {
+    }
+
+    onPlayTwoPlayers() {
+    }
+
+    onPlayAuto() {
+    }
+
+    onAutoPlayPause() {
+    }
+
+    onAutoPlayResume() {
+    }
+
+    onGameBack() {
+    }
+
+    onGameNew() {
+    }
+
+    onBenchmark() {
+    }
+
 
 }

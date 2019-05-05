@@ -7,43 +7,38 @@
 
     <div class="content">
 
-        <!-- <div class="menu">
-            <div id="menu_play">
-                <button id="play_sheep">Play Sheep vs CPU</button>
-                <button id="play_wolf">Play Wolf vs CPU</button>
-                <button id="play_2_players">2 Players</button>
-                <button id="autoplay">Auto Play</button>
+        <div class="menu">
+            <div *ngIf="showMenuPlay">
+                <button (click)="onPlaySheep()">Play Sheep vs CPU</button>
+                <button (click)="onPlayWolf()">Play Wolf vs CPU</button>
+                <button (click)="onPlayTwoPlayers()">2 Players</button>
+                <button (click)="onPlayAuto()">Auto Play</button>
             </div>
 
-            <div id="menu_autoplay">
-                <button id="autoplay_stop">Pause Auto Play</button>
-                <button id="autoplay_resume">Resume Auto Play</button>
+            <div *ngIf="showMenuAutoPlay">
+                <button (click)="onAutoPlayPause()">Pause Auto Play</button>
+                <button (click)="onAutoPlayResume()">Resume Auto Play</button>
             </div>
 
-            <div id="menu_game">
-                <button id="game_back">Move Back</button>
-                <button id="game_new">New Game</button>
+            <div *ngIf="showMenuGame">
+                <button (click)="onGameBack()">Move Back</button>
+                <button (click)="onGameNew()">New Game</button>
             </div>
         </div>
 
-
         <div class="settings">
-
-            <div class="form-item">
+            <div class="setting">
                 <label>Wolf depth</label>
                 <input type="number" [(ngModel)]="settings.wolfDepth">
             </div>
 
-            <div class="form-item">
+            <div class="setting">
                 <label>Sheep depth</label>
                 <input type="number" [(ngModel)]="settings.sheepDepth">
             </div>
 
-            <div>
-                <button (click)="onBenchmark()">Benchmark</button>
-            </div>
-        </div> -->
-
+            <button (click)="onBenchmark()">Benchmark</button>
+        </div>
 
         <div class="board">
             <canvas #canBoard class="can-board" width="600" height="600"> </canvas>
@@ -52,11 +47,12 @@
         <div class="status">
             <span>{{status}}</span>
         </div>
+
         <div class="debug">
             <span>{{debug}}</span>
         </div>
-    </div>
 
+    </div>
 </div>
 
 <router-outlet></router-outlet>
