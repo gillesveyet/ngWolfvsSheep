@@ -7,4 +7,10 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'ngWolfvsSheep';
+  status = 'status line';
+  debug = 'debug line';
+
+
+  settings = { wolfDepth : 12, sheepDepth : 12};
+
 }
