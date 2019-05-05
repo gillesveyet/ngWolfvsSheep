@@ -31,7 +31,7 @@
 .content {
   overflow: auto;
   display: flex;
-  flex-direction: column;
+ flex-direction: column;
 }
 
 $line-height: 21px;
@@ -63,17 +63,28 @@ $line-height: 21px;
   background-color: lightskyblue;
 }
 
-.board {
-  //flex: 0 1 600px;
-  display: flex;
-  flex-direction: column;
-  background-color: aquamarine;
-
-  > .can-board {
-    max-width: 600px;
-    flex: 0 1 600px;
-  }
+.settings {
+    flex: 0 0 230px;
 }
+
+.board {
+    flex: 0 1;
+    margin: 0 10px 0 10px;
+    max-width: 600px;
+}
+
+
+// .board {
+//   flex: 0 1 600px;
+//   display: flex;
+//   flex-direction: column;
+//   background-color: aquamarine;
+
+//   > .can-board {
+//     max-width: 600px;
+//     flex: 0 1 600px;
+//   }
+// }
 
 .status {
   flex: 1 1;
