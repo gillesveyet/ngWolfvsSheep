@@ -21,7 +21,7 @@
             </div>
 
             <div *ngIf="showMenuGame">
-                <button *ngIf="showButtonBack" (click)="onGameBack()">Move Back</button>
+                <button *ngIf="showButtonBack" [disabled]="!enableButtonBack" (click)="onGameBack()">Move Back</button>
                 <button (click)="onGameNew()">New Game</button>
             </div>
         </div>

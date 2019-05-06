@@ -1,6 +1,8 @@
 ﻿import { GameState } from "./GameState";
 import { Pos } from './Pos';
 
+declare function require(path: string) : any;
+
 enum Color {
     Black,
     Aqua,
@@ -32,7 +34,7 @@ export class CheckerPanel {
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
-        //this.canvas.onclick = this.canvas_MouseClick.bind(this);
+
         this.canvas.onclick = (ev: MouseEvent) => {
             //cf. http://miloq.blogspot.co.uk/2011/05/coordinates-mouse-click-canvas.html
             //console.log(Helper.StringFormat("canvas_onclick ev:{0} x={1} y={2} clientX={3} clientY={4} pageXOffset={5} pageYOffset={6} canvas.scrollLeft={7} canvas.scrollTop={8} canvas.offsetLeft={9} canvas.offsetTop={10}", ev, ev.x, ev.y, ev.clientX, ev.clientY, window.pageXOffset, window.pageYOffset, canvas.scrollLeft, canvas.scrollTop, canvas.offsetLeft, canvas.offsetTop));
@@ -41,37 +43,16 @@ export class CheckerPanel {
 
         if (!this.canvas.getContext)
             throw "Browser does not support Canvas";
-    }
 
-    private initCanvas() {
         this.ctx = this.canvas.getContext('2d');
         this.XMAG = this.canvas.width / 10;
         this.YMAG = this.canvas.height / 10;
+
+        this.imgChecker.src = require('../../assets/bitmaps/Checker.png');
+        this.imgWolf.src = require('../../assets/bitmaps/Black.png');
+        this.imgSheep.src = require('../../assets/bitmaps/White.png');
     }
 
-    preloadAssets(): void {
-        this.loadImage(this.imgChecker, 'media/Checker.png');
-        this.loadImage(this.imgWolf, 'media/Black.png');
-        this.loadImage(this.imgSheep, 'media/White.png');
-    }
-
-    private loadImage(img: HTMLImageElement, src: string) {
-        img.onload = this.preloadUpdate.bind(this);
-        img.src = src;
-    }
-
-    private preloadUpdate() {
-        ++this.preloadCount;
-
-        if (this.preloadCount === this.PRELOAD_TOTAL) {
-            this.initCanvas();
-
-            if (this.onPreloadDone)
-                this.onPreloadDone();
-        }
-    }
-
-   
     SetPositions(gs: GameState, enablePlay: boolean): void {
         this.selectedPiece = null;
         this.validMoves = null;

@@ -23,6 +23,8 @@ export class AppComponent {
     showMenuAutoPlay = false;
     showMenuGame = false;
     showButtonBack = false;
+    enableButtonBack = false;
+
     autoPlayPaused = false;
     settings = { wolfDepth: 12, sheepDepth: 12 };
 
@@ -39,10 +41,6 @@ export class AppComponent {
             return this.getGS().getValidMoves(selected);
         };
 
-        this.checker.onPreloadDone = () => {
-            this.resetGame();
-        };
-
         this.checker.onMovePiece = (oldPos: Pos, newPos: Pos) => {
             let gs = this.getGS().makePlayerMove(oldPos, newPos);
             this.addGS(gs);
@@ -55,7 +53,7 @@ export class AppComponent {
                 this.makeCpuPlay();
         }
 
-        this.checker.preloadAssets();
+        this.resetGame();
     }
 
     /**
@@ -241,7 +239,7 @@ export class AppComponent {
             console.log('checkAutoplayStop: true');
             this.showMenuGame = true;
             this.autoPlayPaused = true;
-           
+
             this.ready = true;
             this.updateContext();
             return true;
@@ -303,8 +301,7 @@ export class AppComponent {
     }
 
     updateContext(): void {
-        let allow = this.gameHistory.length > 2 || this.isTwoPlayerMode && this.gameHistory.length > 1;
-        (<HTMLInputElement>document.getElementById("game_back")).disabled = !allow;
+        this.enableButtonBack = this.gameHistory.length > 2 || this.isTwoPlayerMode && this.gameHistory.length > 1;
     }
 
     displayInfo(): void {
