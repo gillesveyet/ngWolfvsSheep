@@ -1,16 +1,20 @@
 ﻿import { GameState } from "./GameState";
 import { Pos } from './Pos';
-
-declare function require(path: string) : any;
+import { Observable } from 'rxjs';
 
 enum Color {
     Black,
     Aqua,
 }
 
+enum Bitmap {
+    Checker = 'Checker',
+    Black = 'Black',
+    White = 'White'
+}
+
 
 export class CheckerPanel {
-    public onPreloadDone: () => void;
     public onGetValidMoves: (selected: Pos) => Pos[];
     public onMovePiece: (oldPos: Pos, newPos: Pos) => void;
 
@@ -24,13 +28,11 @@ export class CheckerPanel {
     private XMAG: number;
     private YMAG: number;
 
-    private imgChecker = new Image();
-    private imgWolf = new Image();
-    private imgSheep = new Image();
+    private bitmaps = {};
 
-    private preloadCount = 0;
-    //private PRELOAD_TOTAL = 2;
-    private PRELOAD_TOTAL = 3;
+    private get imgChecker(): HTMLImageElement { return this.bitmaps[Bitmap.Checker] }
+    private get imgWolf(): HTMLImageElement { return this.bitmaps[Bitmap.Black] }
+    private get imgSheep(): HTMLImageElement { return this.bitmaps[Bitmap.White] }
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
@@ -47,11 +49,28 @@ export class CheckerPanel {
         this.ctx = this.canvas.getContext('2d');
         this.XMAG = this.canvas.width / 10;
         this.YMAG = this.canvas.height / 10;
-
-        this.imgChecker.src = require('../../assets/bitmaps/Checker.png');
-        this.imgWolf.src = require('../../assets/bitmaps/Black.png');
-        this.imgSheep.src = require('../../assets/bitmaps/White.png');
     }
+
+
+    init() {
+        return new Observable(observer => {
+            let count = 0;
+
+            for (let bmp in Bitmap) {
+                let img = this.bitmaps[bmp] = new Image();
+
+                img.onload = () => {
+                    if (++count === 3) {
+                        observer.next();
+                        observer.complete();
+                    }
+                };
+
+                img.src = `assets/bitmaps/${bmp}.png`;
+            }
+        });
+    }
+
 
     SetPositions(gs: GameState, enablePlay: boolean): void {
         this.selectedPiece = null;

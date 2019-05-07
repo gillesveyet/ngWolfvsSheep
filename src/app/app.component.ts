@@ -53,7 +53,9 @@ export class AppComponent {
                 this.makeCpuPlay();
         }
 
-        this.resetGame();
+        this.checker.init().subscribe(() => {
+            this.resetGame();
+        });
     }
 
     /**
@@ -123,6 +125,7 @@ export class AppComponent {
     }
 
     resetGame() {
+        console.log('resetGame');
         this.gameHistory = [];
         this.checker.SetPositions(null, false);
         this.ready = true;
