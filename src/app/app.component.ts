@@ -26,7 +26,7 @@ export class AppComponent {
     enableButtonBack = false;
 
     autoPlayPaused = false;
-    settings = { wolfDepth: 12, sheepDepth: 12 };
+    settings = { wolfDepth: DEFAULT_DEPTH, sheepDepth: DEFAULT_DEPTH };
 
     checker: CheckerPanel;
     gameHistory: GameState[] = [];
