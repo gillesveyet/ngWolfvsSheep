@@ -71,8 +71,7 @@ export class CheckerPanel {
         });
     }
 
-
-    SetPositions(gs: GameState, enablePlay: boolean): void {
+    setPositions(gs: GameState, enablePlay: boolean): void {
         this.selectedPiece = null;
         this.validMoves = null;
 
@@ -108,7 +107,7 @@ export class CheckerPanel {
 */
 
     // new wait layer: bottom left
-    ShowWaitLayer() {
+    showWaitLayer() {
         let text = "Please wait...";
         let fontSize = this.canvas.height / 20;
 

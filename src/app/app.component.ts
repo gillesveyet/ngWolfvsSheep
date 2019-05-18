@@ -18,19 +18,24 @@ export class AppComponent {
     status: string;
     debug: string;
 
-    isExpertMode: false;
+    isExpertMode = false;
     showMenuPlay = true;
-    showMenuAutoPlay = false;
-    showMenuGame = false;
-    showButtonBack = false;
-    enableButtonBack = false;
-
+    autoplay = false;
     autoPlayPaused = false;
     settings = { wolfDepth: DEFAULT_DEPTH, sheepDepth: DEFAULT_DEPTH };
 
     checker: CheckerPanel;
     gameHistory: GameState[] = [];
     ready = false;
+
+    get showMenuGame() {
+        return !this.showMenuPlay && (!this.autoplay || this.autoPlayPaused);
+    }
+
+    get isGameBackEnabled() {
+        return this.gameHistory.length > 2 || this.isTwoPlayerMode && this.gameHistory.length > 1;
+    }
+
 
     @ViewChild('canBoard') canvasRef: ElementRef;
 
@@ -44,9 +49,9 @@ export class AppComponent {
         this.checker.onMovePiece = (oldPos: Pos, newPos: Pos) => {
             let gs = this.getGS().makePlayerMove(oldPos, newPos);
             this.addGS(gs);
-            this.checker.SetPositions(gs, this.isTwoPlayerMode && !gs.isGameOver);
+            this.checker.setPositions(gs, this.isTwoPlayerMode && !gs.isGameOver);
 
-            this.updateContext();
+            //this.updateContext();
             this.displayInfo();
 
             if (!gs.isGameOver && !this.isTwoPlayerMode)
@@ -72,7 +77,6 @@ export class AppComponent {
         }
     }
 
-
     handleExpertPlay() {
         let gs = this.getGS();
         if (this.ready && this.isExpertMode && gs && !gs.isGameOver) {
@@ -92,9 +96,6 @@ export class AppComponent {
         }
     }
 
-
-
-
     get playerMode(): PlayerMode {
         return Model.playerMode;
     }
@@ -105,10 +106,6 @@ export class AppComponent {
 
     get isTwoPlayerMode(): boolean {
         return this.playerMode === PlayerMode.TwoPlayers;
-    }
-
-    get isAutoplayMode(): boolean {
-        return this.playerMode === PlayerMode.Autoplay;
     }
 
     getGS(): GameState {
@@ -127,15 +124,13 @@ export class AppComponent {
     resetGame() {
         console.log('resetGame');
         this.gameHistory = [];
-        this.checker.SetPositions(null, false);
+        this.checker.setPositions(null, false);
         this.ready = true;
 
+        this.showMenuPlay = true;
+        this.autoplay = false;
 
-        this.showMenuAutoPlay = true;
-        this.showMenuGame = false;
-        this.showMenuAutoPlay = false;
-
-        this.updateContext();
+        //this.updateContext();
         this.displayInfo();
     }
 
@@ -152,34 +147,42 @@ export class AppComponent {
 
     onPlaySheep() {
         this.playerMode = PlayerMode.PlaySheep;
+        this.autoplay = false;
         this.startGame();
     }
 
     onPlayWolf() {
         this.playerMode = PlayerMode.PlayWolf;
+        this.autoplay = false;
         this.startGame();
     }
 
     onPlayTwoPlayers() {
         this.playerMode = PlayerMode.TwoPlayers
+        this.autoplay = false;
         this.startGame();
     }
 
     onPlayAuto() {
-        this.playerMode = PlayerMode.Autoplay;
+        this.playerMode = PlayerMode.TwoPlayers;
+        this.autoplay = true;
         this.startGame();
     }
 
-    onAutoPlayPause() {
-        this.autoplayStop();
+    onAutoplayPause() {
+        console.log('onAutoPlayPause');
+        this.autoPlayPaused = true;
     }
 
-    onAutoPlayResume() {
-        this.autoplayResume();
+    onAutoplayResume() {
+        console.log('autoplayResume');
+        this.autoPlayPaused = false;
+        this.playAuto();
     }
 
     onGameBack() {
-        if (this.isTwoPlayerMode) {
+        // if player wins (computer did not play so playerMode does not match last game state) => remove single mpve.
+        if (this.isTwoPlayerMode || (this.playerMode === PlayerMode.PlayWolf) !== this.getGS().isWolf) {
             this.gameHistory.pop();
         }
         else {
@@ -188,9 +191,9 @@ export class AppComponent {
             this.gameHistory.pop();
         }
 
-        this.checker.SetPositions(this.getGS(), true);
+        this.checker.setPositions(this.getGS(), true);
 
-        this.updateContext();
+        //this.updateContext();
         this.displayInfo();
     }
 
@@ -211,101 +214,55 @@ export class AppComponent {
         this.ready = true;
     }
 
-    autoplay() {
-        if (this.checkAutoplayStop())
-            return;
-
-        this.ready = false;
+    playAuto() {
         this.displayStatus("Auto Play...");
 
         setTimeout(() => {
-            if (this.checkAutoplayStop())
+            if (this.autoPlayPaused) {
+                this.pauseAutoplay();
                 return;
+            }
 
             this.cpuPlay(this.isGameOver);
 
-            if (!this.isGameOver) {
-                this.autoplay();
+            if (this.isGameOver) {
+                this.autoPlayPaused = true;
+            } else if (this.autoPlayPaused) {
+                this.pauseAutoplay();
             } else {
-                this.ready = true;
-                this.playerMode = PlayerMode.TwoPlayers;
-                this.showMenuAutoPlay = false;
-                this.showMenuGame = true;
-                this.updateContext();
+                this.playAuto();
             }
 
         }, 200);
     }
 
-    checkAutoplayStop(): boolean {
-        if (!this.isAutoplayMode) {
-            console.log('checkAutoplayStop: true');
-            this.showMenuGame = true;
-            this.autoPlayPaused = true;
-
-            this.ready = true;
-            this.updateContext();
-            return true;
-        }
-        else
-            return false;
+    pauseAutoplay() {
+        this.checker.setPositions(this.getGS(), true);
+        this.displayInfo();
     }
-
-
-    autoplayStop() {
-        console.log('autoplayStop');
-        this.playerMode = PlayerMode.TwoPlayers;
-    }
-
-
-    autoplayResume() {
-        console.log('autoplayResume');
-        this.playerMode = PlayerMode.Autoplay;
-
-        this.showMenuGame = false;
-        this.autoPlayPaused = false;
-
-        this.updateContext();
-        this.autoplay();
-    }
-
 
     startGame(): void {
         let gameBack = true;
-
-        if (this.isAutoplayMode) {
-            this.showMenuGame = false;
-            this.showMenuAutoPlay = true;
-            this.autoPlayPaused = false;
-            this.showButtonBack = this.isExpertMode;
-        }
-        else {
-            this.showButtonBack = true;
-            this.showMenuGame = true;
-        }
 
         this.showMenuPlay = false;
 
         let gs = GameState.GetInitialGameState()
         this.addGS(gs);
 
-        this.checker.SetPositions(gs, this.playerMode === PlayerMode.PlayWolf || this.isTwoPlayerMode);
-        this.updateContext();
+        this.checker.setPositions(gs, this.playerMode === PlayerMode.PlayWolf || this.isTwoPlayerMode);
+        //this.updateContext();
         this.displayInfo();
 
-        switch (this.playerMode) {
-            case PlayerMode.PlaySheep:
-                this.makeCpuPlay();
-                break;
-            case PlayerMode.Autoplay:
-                this.autoplay();
-                break;
+        if (this.autoplay) {
+            this.autoPlayPaused = false;
+            this.playAuto();
+        } else if (this.playerMode === PlayerMode.PlaySheep) {
+            this.makeCpuPlay();
         }
     }
 
-    updateContext(): void {
-        this.enableButtonBack = this.gameHistory.length > 2 || this.isTwoPlayerMode && this.gameHistory.length > 1;
-    }
+    // updateContext(): void {
+    // }
 
     displayInfo(): void {
         let gs = this.getGS();
@@ -326,7 +283,7 @@ export class AppComponent {
     showVictory(gs: GameState): void {
         let msg: string;
 
-        if (this.isTwoPlayerMode || this.isAutoplayMode) {
+        if (this.isTwoPlayerMode) {
             if (gs.status === GameStatus.SheepWon)
                 msg = "Sheep win!";
             else
@@ -348,16 +305,16 @@ export class AppComponent {
         this.addGS(gs);
 
         this.displayDebug(solver.statusString);
-        this.checker.SetPositions(gs, enable && !gs.isGameOver);
+        this.checker.setPositions(gs, enable && !gs.isGameOver);
 
-        this.updateContext();
+        //this.updateContext();
         this.displayInfo();
     }
 
 
     makeCpuPlay(): void {
         this.ready = false;
-        this.checker.ShowWaitLayer();
+        this.checker.showWaitLayer();
 
         this.displayStatus("Computer is thinking...");
         setTimeout(() => {

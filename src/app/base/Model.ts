@@ -1,8 +1,7 @@
 export enum PlayerMode {
     PlayWolf = 1,
     PlaySheep = 2,
-    TwoPlayers = 3,
-    Autoplay = 4
+    TwoPlayers = 3
 }
 
 export class Model {
