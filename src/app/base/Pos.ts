@@ -44,8 +44,8 @@ export class Pos {
 		return x >= 0 && x < 10 && y >= 0 && y < 10 && (x + y) % 2 !== 0;
 	}
 
-	x: number;
-	y: number;
+	x: number;  // 0 = left, 9 = right
+	y: number;  // 0 = top,  9 = bottom
 	pval: number;
 
 	constructor(x: number, y: number) {

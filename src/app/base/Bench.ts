@@ -25,7 +25,7 @@ export class Bench
 		let nbTotal = 0;
 		let solver: Solver;
 
-		let gs = GameState.GetInitialGameState();
+		let gs = GameState.getInitialGameState();
 
 		for (; !gs.isGameOver ;)
 		{

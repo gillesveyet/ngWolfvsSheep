@@ -181,7 +181,7 @@ export class AppComponent {
     }
 
     onGameBack() {
-        // if player wins (computer did not play so playerMode does not match last game state) => remove single mpve.
+        // if player won (computer did not play so playerMode does not match latest game state) => remove single mpve.
         if (this.isTwoPlayerMode || (this.playerMode === PlayerMode.PlayWolf) !== this.getGS().isWolf) {
             this.gameHistory.pop();
         }
@@ -246,7 +246,7 @@ export class AppComponent {
 
         this.showMenuPlay = false;
 
-        let gs = GameState.GetInitialGameState()
+        let gs = GameState.getInitialGameState()
         this.addGS(gs);
 
         this.checker.setPositions(gs, this.playerMode === PlayerMode.PlayWolf || this.isTwoPlayerMode);
