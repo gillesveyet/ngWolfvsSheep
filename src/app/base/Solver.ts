@@ -54,6 +54,9 @@ export class Solver {
 
         this.dictTmp = {};
 
+        gsParent.children = null;
+        //gs.children = null;   // unnecessary as it is already null.
+
         return gs;
     }
 
