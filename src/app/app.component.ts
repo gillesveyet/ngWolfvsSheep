@@ -82,7 +82,7 @@ export class AppComponent {
         if (this.ready && this.isExpertMode && gs && !gs.isGameOver) {
 
             this.ready = false;
-            this.displayStatus("Thinking...");
+            this.displayStatus('Thinking...');
 
             setTimeout(() => {
                 this.cpuPlay(this.isTwoPlayerMode);
@@ -198,7 +198,7 @@ export class AppComponent {
     }
 
     onGameNew() {
-        if (!this.isGameOver && !confirm("Cancel current game and start a new game?"))
+        if (!this.isGameOver && !confirm('Cancel current game and start a new game?'))
             return;
 
         this.resetGame();
@@ -208,14 +208,14 @@ export class AppComponent {
         //from http://en.nisi.ro/blog/development/javascript/open-new-window-window-open-seen-chrome-popup/
         //Open the window just after onClick event so that Chrome consider that it is not a popup (which are blocked by default on Chrome)
         //Chrome Settings / Advanced Settings / Content Settings : Do not allow any site to show popups - Manage exceptions
-        let wnd = window.open("", "Benchmark");
+        let wnd = window.open('', 'Benchmark');
         this.ready = false;
         Bench.Run(this.settings.wolfDepth, this.settings.sheepDepth, wnd);
         this.ready = true;
     }
 
     playAuto() {
-        this.displayStatus("Auto Play...");
+        this.displayStatus('Auto Play...');
 
         setTimeout(() => {
             if (this.autoPlayPaused) {
@@ -268,14 +268,14 @@ export class AppComponent {
         let gs = this.getGS();
 
         if (gs == null)
-            this.displayStatus("Select mode");
+            this.displayStatus('Select mode');
         else if (gs.isGameOver)
             this.showVictory(gs);
         else {
             if (gs.isWolf)
-                this.displayStatus("Wolf turn: move wolf.");
+                this.displayStatus('Wolf turn: move wolf.');
             else
-                this.displayStatus("Sheep turn: select a sheep (white) to play.");
+                this.displayStatus('Sheep turn: select a sheep (white) to play.');
         }
     }
 
@@ -285,14 +285,14 @@ export class AppComponent {
 
         if (this.isTwoPlayerMode) {
             if (gs.status === GameStatus.SheepWon)
-                msg = "Sheep win!";
+                msg = 'Sheep win!';
             else
-                msg = "Wolf wins!";
+                msg = 'Wolf wins!';
         } else {
             if ((gs.status === GameStatus.WolfWon) === (this.playerMode === PlayerMode.PlayWolf))
-                msg = "You win!";
+                msg = 'You win!';
             else
-                msg = "You lose!";
+                msg = 'You lose!';
         }
 
         this.displayStatus(msg);
@@ -316,7 +316,7 @@ export class AppComponent {
         this.ready = false;
         this.checker.showWaitLayer();
 
-        this.displayStatus("Computer is thinking...");
+        this.displayStatus('Computer is thinking...');
         setTimeout(() => {
             this.cpuPlay(true);
             this.ready = true;

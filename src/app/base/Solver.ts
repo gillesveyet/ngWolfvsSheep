@@ -1,7 +1,7 @@
-import { HashTable } from "./Helper";
-import { Pos } from "./Pos";
+import { HashTable } from './Helper';
+import { Pos } from './Pos';
 
-import { GameState, NB_SHEEP, MIN_SCORE, MAX_SCORE } from "./GameState";
+import { GameState, NB_SHEEP, MIN_SCORE, MAX_SCORE } from './GameState';
 
 //Reference: An Introduction to Game Tree Algorithms : http://www.hamedahmadi.com/gametree/
 //

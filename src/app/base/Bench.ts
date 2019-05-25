@@ -1,55 +1,44 @@
-import { Solver } from "./Solver";
+import { Solver } from './Solver';
 import { GameState, GameStatus } from './GameState';
+import { detect } from 'detect-browser';
 
-export class Bench
-{
-	private static getBrowserName() : string
-	{
-		let agt = navigator.userAgent;
+export class Bench {
+    static Run(sheepDepth: number, wolfDepth: number, win: Window): void {
+        win.document.write('<p>Benchmark running. Please wait.</p>');
 
-		if (agt.indexOf("Trident") > 0)
-			return "Internet Explorer";
+        let browser = detect();
+        let res = `${new Date().toISOString()} sheepDepth:${sheepDepth} wolfDepth:${wolfDepth} ${browser.name} ${browser.version}`;
+        res += '<br>';
 
-		return agt.substring(agt.lastIndexOf(" "));
-	}
+        let tsTotal = 0;
+        let tsMax = 0;
+        let nbTotal = 0;
+        let solver: Solver;
 
-	static Run(sheepDepth: number, wolfDepth: number, win: Window): void
-	{
-		win.document.write("<p>Benchmark running. Please wait.</p>");
+        let gs = GameState.getInitialGameState();
 
-		let res = `${new Date().toISOString()} sheepDepth:$sheepDepth1} wolfDepth:${wolfDepth} ${this.getBrowserName()}`;
-		res += "<br>";
+        for (; !gs.isGameOver;) {
+            solver = new Solver();
 
-		let tsTotal = 0;
-		let tsMax = 0;
-		let nbTotal = 0;
-		let solver: Solver;
+            if (gs.isWolf)
+                gs = solver.play(gs, wolfDepth);
+            else
+                gs = solver.play(gs, sheepDepth);
 
-		let gs = GameState.getInitialGameState();
+            tsTotal += solver.elapsed;
+            nbTotal += solver.nbIterations;
 
-		for (; !gs.isGameOver ;)
-		{
-			solver = new Solver();
+            if (solver.elapsed > tsMax)
+                tsMax = solver.elapsed;
 
-			if (gs.isWolf)
-				gs = solver.play(gs, wolfDepth);
-			else
-				gs = solver.play(gs, sheepDepth);
+            res += solver.statusString + '<br>';
+        }
 
-			tsTotal += solver.elapsed;
-			nbTotal += solver.nbIterations;
+        res += `Done in ${tsTotal} ms - Max=${tsMax} ms - NbTotal=${nbTotal} - Result:${solver.score} ${GameStatus[gs.status]} ${gs.status === GameStatus.SheepWon ? 'OK' : 'FAIL'}`;
 
-			if (solver.elapsed > tsMax)
-				tsMax = solver.elapsed;
+        if (!win)
+            win = window.open('', 'Benchmark');
 
-			res += solver.statusString + "<br>";
-		}
-
-		res += `Done in ${tsTotal} ms - Max=${tsMax} ms - NbTotal=${nbTotal} - Result:${solver.score} ${GameStatus[gs.status]} ${gs.status === GameStatus.SheepWon ? 'OK' : 'FAIL'}`;
-
-		if( !win)
-			win = window.open("", "Benchmark");
-
-		win.document.write(`<p style="font-family:Courier New;">` + res + `</p>`);
-	}
+        win.document.write(`<p style='font-family:Courier New;'>` + res + `</p>`);
+    }
 }

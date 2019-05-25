@@ -1,4 +1,4 @@
-﻿import { GameState } from "./GameState";
+﻿import { GameState } from './GameState';
 import { Pos } from './Pos';
 import { Observable } from 'rxjs';
 
@@ -39,12 +39,12 @@ export class CheckerPanel {
 
         this.canvas.onclick = (ev: MouseEvent) => {
             //cf. http://miloq.blogspot.co.uk/2011/05/coordinates-mouse-click-canvas.html
-            //console.log(Helper.StringFormat("canvas_onclick ev:{0} x={1} y={2} clientX={3} clientY={4} pageXOffset={5} pageYOffset={6} canvas.scrollLeft={7} canvas.scrollTop={8} canvas.offsetLeft={9} canvas.offsetTop={10}", ev, ev.x, ev.y, ev.clientX, ev.clientY, window.pageXOffset, window.pageYOffset, canvas.scrollLeft, canvas.scrollTop, canvas.offsetLeft, canvas.offsetTop));
+            //console.log(Helper.StringFormat('canvas_onclick ev:{0} x={1} y={2} clientX={3} clientY={4} pageXOffset={5} pageYOffset={6} canvas.scrollLeft={7} canvas.scrollTop={8} canvas.offsetLeft={9} canvas.offsetTop={10}', ev, ev.x, ev.y, ev.clientX, ev.clientY, window.pageXOffset, window.pageYOffset, canvas.scrollLeft, canvas.scrollTop, canvas.offsetLeft, canvas.offsetTop));
             this.canvas_MouseClick((ev.clientX - canvas.offsetLeft + window.pageXOffset) / this.XMAG | 0, (ev.clientY - canvas.offsetTop + window.pageYOffset) / this.YMAG | 0);
         };
 
         if (!this.canvas.getContext)
-            throw "Browser does not support Canvas";
+            throw 'Browser does not support Canvas';
 
         this.ctx = this.canvas.getContext('2d');
         this.XMAG = this.canvas.width / 10;
@@ -88,37 +88,37 @@ export class CheckerPanel {
     // old wait layer : centered
 	ShowWaitLayer()
 	{
-		let text = "Wait...";
+		let text = 'Wait...';
 		let fontSize = this.canvas.height / 8;
 
-		this.ctx.font = fontSize + "px Verdana";
+		this.ctx.font = fontSize + 'px Verdana';
 		let width = this.ctx.measureText(text).width;
 
 		let x = (this.canvas.width - width) / 2;
 		let y = (this.canvas.height-fontSize) / 2;
 
-		this.ctx.fillStyle = "rgba(160, 160, 160, 0.85)";
+		this.ctx.fillStyle = 'rgba(160, 160, 160, 0.85)';
 		this.ctx.fillRect(x - fontSize/2, y- fontSize/2.5, width + fontSize, fontSize*2);
 
-		this.ctx.textBaseline = "top";
-		this.ctx.fillStyle = "#FF0066";
+		this.ctx.textBaseline = 'top';
+		this.ctx.fillStyle = '#FF0066';
 		this.ctx.fillText(text, x , y);
 	}
 */
 
     // new wait layer: bottom left
     showWaitLayer() {
-        let text = "Please wait...";
+        let text = 'Please wait...';
         let fontSize = this.canvas.height / 20;
 
-        this.ctx.font = fontSize + "px Verdana";
+        this.ctx.font = fontSize + 'px Verdana';
         let width = this.ctx.measureText(text).width;
 
-        this.ctx.fillStyle = "rgba(160, 160, 160, 0.7)";
+        this.ctx.fillStyle = 'rgba(160, 160, 160, 0.7)';
         this.ctx.fillRect(0, this.canvas.height - 2 * fontSize, width + fontSize, fontSize * 2);
 
-        this.ctx.textBaseline = "bottom";
-        this.ctx.fillStyle = "#FF0066";
+        this.ctx.textBaseline = 'bottom';
+        this.ctx.fillStyle = '#FF0066';
         this.ctx.fillText(text, fontSize / 2, this.canvas.height - fontSize / 2);
     }
 
@@ -140,8 +140,8 @@ export class CheckerPanel {
         // To check if order of sheep position is correct
         // if (IsExpertMode)
         // {
-        // 	this.ctx.textAlign = "left";
-        // 	this.ctx.textBaseline = "top";
+        // 	this.ctx.textAlign = 'left';
+        // 	this.ctx.textBaseline = 'top';
         // 	this.ctx.strokeStyle = Color[Color.Black];
         // 	this.ctx.lineWidth = 1;
         //
@@ -231,7 +231,7 @@ export class CheckerPanel {
 
         let p = Pos.GetPos(x, y);
 
-        //console.log("canvas_MouseClick - x=" + x + " y=" + y + " p=" + p + " this.Selected=" + this.selectedPiece); // + " - onMovePiece: " + this.onMovePiece);
+        //console.log('canvas_MouseClick - x=' + x + ' y=' + y + ' p=' + p + ' this.Selected=' + this.selectedPiece); // + ' - onMovePiece: ' + this.onMovePiece);
 
         if (!this.gameState.isWolf && this.isSheep(p))
             this.updateSelected(p, true);
