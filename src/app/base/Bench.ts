@@ -3,11 +3,11 @@ import { GameState, GameStatus } from './GameState';
 import { detect } from 'detect-browser';
 
 export class Bench {
-    static Run(sheepDepth: number, wolfDepth: number, win: Window): void {
+    static Run(win: Window, settings: { wolfDepth: number, sheepDepth: number }): void {
         win.document.write('<p>Benchmark running. Please wait.</p>');
 
         let browser = detect();
-        let res = `${new Date().toISOString()} sheepDepth:${sheepDepth} wolfDepth:${wolfDepth} ${browser.name} ${browser.version}`;
+        let res = `${new Date().toISOString()} sheepDepth:${settings.sheepDepth} wolfDepth:${settings.wolfDepth} ${browser.name} ${browser.version}`;
         res += '<br>';
 
         let tsTotal = 0;
@@ -18,11 +18,9 @@ export class Bench {
         let gs = GameState.getInitialGameState();
 
         for (; !gs.isGameOver;) {
+            solver = new Solver();
 
-            if (gs.isWolf)
-                gs = solver.play(gs, wolfDepth);
-            else
-                gs = solver.play(gs, sheepDepth);
+            gs = solver.play(gs, gs.isWolf ? settings.wolfDepth : settings.sheepDepth);
 
             tsTotal += solver.elapsed;
             nbTotal += solver.nbIterations;

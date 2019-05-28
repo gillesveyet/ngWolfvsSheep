@@ -194,7 +194,7 @@ export class AppComponent {
         //Chrome Settings / Advanced Settings / Content Settings : Do not allow any site to show popups - Manage exceptions
         let wnd = window.open('', 'Benchmark');
         this.ready = false;
-        Bench.Run(this.settings.wolfDepth, this.settings.sheepDepth, wnd);
+        Bench.Run(wnd, this.settings);
         this.ready = true;
     }
 
