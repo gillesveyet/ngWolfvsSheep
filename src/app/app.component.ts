@@ -21,15 +21,16 @@ export class AppComponent {
     isExpertMode = false;
     showMenuPlay = true;
     autoplay = false;
-    autoPlayPaused = false;
+    autoplayPaused = false;
     settings = { wolfDepth: DEFAULT_DEPTH, sheepDepth: DEFAULT_DEPTH };
 
+    solver = new Solver();
     checker: CheckerPanel;
     gameHistory: GameState[] = [];
     ready = false;
 
     get showMenuGame() {
-        return !this.showMenuPlay && (!this.autoplay || this.autoPlayPaused);
+        return !this.showMenuPlay && (!this.autoplay || this.autoplayPaused);
     }
 
     get isGameBackEnabled() {
@@ -51,7 +52,6 @@ export class AppComponent {
             this.addGS(gs);
             this.checker.setPositions(gs, this.isTwoPlayerMode && !gs.isGameOver);
 
-            //this.updateContext();
             this.displayInfo();
 
             if (!gs.isGameOver && !this.isTwoPlayerMode)
@@ -71,28 +71,17 @@ export class AppComponent {
     onKeydownHandler(evt: KeyboardEvent) {
         switch (evt.which || evt.keyCode || parseInt(evt.code, 10)) {
             case 32: //space key
-                console.log(`Space pressed class:'${document.activeElement.className}'`, document.activeElement);
-                this.handleExpertPlay
+                // console.log(`Space pressed`, document.activeElement);
+                this.handleExpertPlay();
+                evt.preventDefault();
                 break;
         }
     }
 
     handleExpertPlay() {
         let gs = this.getGS();
-        if (this.ready && this.isExpertMode && gs && !gs.isGameOver) {
-
-            this.ready = false;
-            this.displayStatus('Thinking...');
-
-            setTimeout(() => {
-                this.cpuPlay(this.isTwoPlayerMode);
-
-                if (!this.isTwoPlayerMode && !this.isGameOver) {
-                    this.cpuPlay(true);
-                }
-
-                this.ready = true;
-            }, 200);
+        if (gs && !gs.isGameOver && this.autoplay && this.autoplayPaused && this.ready) {
+            this.makeCpuPlay();
         }
     }
 
@@ -124,13 +113,12 @@ export class AppComponent {
     resetGame() {
         console.log('resetGame');
         this.gameHistory = [];
+        this.solver.reset();
         this.checker.setPositions(null, false);
-        this.ready = true;
-
         this.showMenuPlay = true;
         this.autoplay = false;
+        this.ready = true;
 
-        //this.updateContext();
         this.displayInfo();
     }
 
@@ -140,10 +128,7 @@ export class AppComponent {
 
     displayDebug(msg: string) {
         this.debug = msg;
-        console.log(msg);
     }
-
-
 
     onPlaySheep() {
         this.playerMode = PlayerMode.PlaySheep;
@@ -171,13 +156,13 @@ export class AppComponent {
 
     onAutoplayPause() {
         console.log('onAutoPlayPause');
-        this.autoPlayPaused = true;
+        this.autoplayPaused = true;
     }
 
     onAutoplayResume() {
         console.log('autoplayResume');
-        this.autoPlayPaused = false;
-        this.playAuto();
+        this.autoplayPaused = false;
+        this.playLoop();
     }
 
     onGameBack() {
@@ -193,7 +178,6 @@ export class AppComponent {
 
         this.checker.setPositions(this.getGS(), true);
 
-        //this.updateContext();
         this.displayInfo();
     }
 
@@ -214,23 +198,23 @@ export class AppComponent {
         this.ready = true;
     }
 
-    playAuto() {
+    playLoop() {
         this.displayStatus('Auto Play...');
 
         setTimeout(() => {
-            if (this.autoPlayPaused) {
+            if (this.autoplayPaused) {
                 this.pauseAutoplay();
                 return;
             }
 
-            this.cpuPlay(this.isGameOver);
+            this.cpuPlay(false);
 
             if (this.isGameOver) {
-                this.autoPlayPaused = true;
-            } else if (this.autoPlayPaused) {
+                this.autoplayPaused = true;
+            } else if (this.autoplayPaused) {
                 this.pauseAutoplay();
             } else {
-                this.playAuto();
+                this.playLoop();
             }
 
         }, 200);
@@ -250,19 +234,15 @@ export class AppComponent {
         this.addGS(gs);
 
         this.checker.setPositions(gs, this.playerMode === PlayerMode.PlayWolf || this.isTwoPlayerMode);
-        //this.updateContext();
         this.displayInfo();
 
         if (this.autoplay) {
-            this.autoPlayPaused = false;
-            this.playAuto();
+            this.autoplayPaused = false;
+            this.playLoop();
         } else if (this.playerMode === PlayerMode.PlaySheep) {
             this.makeCpuPlay();
         }
     }
-
-    // updateContext(): void {
-    // }
 
     displayInfo(): void {
         let gs = this.getGS();
@@ -300,17 +280,13 @@ export class AppComponent {
     }
 
     cpuPlay(enable: boolean) {
-        let solver = new Solver();
-        let gs = solver.play(this.getGS(), this.getGS().isWolf ? this.settings.wolfDepth : this.settings.sheepDepth);
+        let gs = this.solver.play(this.getGS(), this.getGS().isWolf ? this.settings.wolfDepth : this.settings.sheepDepth);
         this.addGS(gs);
 
-        this.displayDebug(solver.statusString);
+        this.displayDebug(this.solver.statusString);
         this.checker.setPositions(gs, enable && !gs.isGameOver);
-
-        //this.updateContext();
         this.displayInfo();
     }
-
 
     makeCpuPlay(): void {
         this.ready = false;
@@ -320,6 +296,6 @@ export class AppComponent {
         setTimeout(() => {
             this.cpuPlay(true);
             this.ready = true;
-        }, 200);
+        }, 0);
     }
 }

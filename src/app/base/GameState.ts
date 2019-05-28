@@ -25,7 +25,9 @@ export class GameState {
     private static initSheepBest(): void {
         let best: Pos[][] = [];
 
-        for (let n = 0; n < 45; ++n) {  // sheep can play 45 times. 
+        // Sheep can play 45 times but only store 30 : this consumes more cycles but should give better (quicker win for sheep).
+        // Also must not store 45 otherwise Solver must handle case when sheep wins on their move (wolf has no moves left). 
+        for (let n = 0; n < 30; ++n) {
             let sheep: Pos[] = [];
 
             let k = n % 10;
@@ -537,7 +539,7 @@ export class GameState {
     wolf: Pos;
     sheep: Pos[];
     score: number;
-    children: GameState[];	// only at depth=0
+    children: GameState[];
 
     constructor(nbMoves: number, wolf: Pos, sheep: Pos[]) {
         this.nbMoves = nbMoves;
@@ -621,14 +623,11 @@ export class GameState {
         return this.hasWolfPlayed ? this.score : -this.score;
     }
 
-    get scoreForCompare(): number {
-        return this.score === undefined ? MIN_SCORE : this.score;
-    }
-
-
     get status(): GameStatus {
         if (this.score === MAX_SCORE)
             return this.hasWolfPlayed ? GameStatus.WolfWon : GameStatus.SheepWon;
+        else if (this.score === -MAX_SCORE)
+            return this.hasWolfPlayed ? GameStatus.SheepWon : GameStatus.WolfWon;
         else
             return GameStatus.NotFinished;
     }
@@ -695,8 +694,12 @@ export class GameState {
         let yh = this.sheep[4].y;
         let yl = this.sheep[0].y;
 
-        let b: Pos[] = GameState.sheepBest[this.nbMoves / 2 | 0];
-        // b cannot be null since we populate tha array with all possible sheep moves (45 times).
+        let nb = this.nbMoves / 2 | 0;
+
+        if (nb >= GameState.sheepBest.length)
+            return false;
+
+        let b: Pos[] = GameState.sheepBest[nb];
         //console.log(`isSheepBest ${this.nbMoves} => ${b}`);
         return yh - yl <= 1 && this.sheep[0].equals(b[0]) && this.sheep[1].equals(b[1]) && this.sheep[2].equals(b[2]) && this.sheep[3].equals(b[3]) && this.sheep[4].equals(b[4]);
     }
@@ -709,6 +712,7 @@ export class GameState {
         return this.sheep[0].y - this.wolf.y;
     }
 
+    //Sheep turn but cannot prevent wolf to win.
     public get wolfWillWin(): boolean {
         let wy = this.wolf.y;
 

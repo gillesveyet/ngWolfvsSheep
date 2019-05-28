@@ -13,12 +13,11 @@ export class Bench {
         let tsTotal = 0;
         let tsMax = 0;
         let nbTotal = 0;
-        let solver: Solver;
+        let solver = new Solver();
 
         let gs = GameState.getInitialGameState();
 
         for (; !gs.isGameOver;) {
-            solver = new Solver();
 
             if (gs.isWolf)
                 gs = solver.play(gs, wolfDepth);
@@ -33,6 +32,8 @@ export class Bench {
 
             res += solver.statusString + '<br>';
         }
+
+        solver.reset();
 
         res += `Done in ${tsTotal} ms - Max=${tsMax} ms - NbTotal=${nbTotal} - Result:${solver.score} ${GameStatus[gs.status]} ${gs.status === GameStatus.SheepWon ? 'OK' : 'FAIL'}`;
 

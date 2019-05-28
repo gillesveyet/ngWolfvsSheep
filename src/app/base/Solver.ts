@@ -22,40 +22,60 @@ import { GameState, NB_SHEEP, MIN_SCORE, MAX_SCORE } from './GameState';
 export class Solver {
     private maxDepth: number;
     private readonly pruneDepth = 10;
-    private dictTmp: HashTable<number>;
+    private dictTmp: HashTable<GameState> = {};
 
     public score: number;
     public elapsed: number;
     public nbIterations: number;
+    public nbPlay: number;
+    public nbFound: number;
     public statusString: string;
+
+    public reset() {
+        this.dictTmp = {};
+    }
 
     public play(gsParent: GameState, maxDepth: number): GameState {
         this.maxDepth = maxDepth - 1;
-        this.nbIterations = 0;
-        this.dictTmp = {};
+        this.nbFound = this.nbPlay = this.nbIterations = 0;
 
+        this.reset();
         let startDate = new Date();
+
+        if (gsParent.children && gsParent.children.length === 0) {
+            console.log('bug1', gsParent);
+        }
+
 
         this.negaMax(gsParent, 0, MIN_SCORE, MAX_SCORE);
 
-        let gs = null;
+        let gs: GameState = null;
+        let x = MIN_SCORE - 1;
+
+        if (!gsParent.children || gsParent.children.length === 0) {
+            console.log('bug2', gsParent);
+        }
 
         for (let gsChild of gsParent.children) {
-            let val = gsChild.score;
-
-            if (val !== undefined && (!gs || val > gs.score)) {
+            if (gsChild.score > x) {
+                x = gsChild.score;
                 gs = gsChild;
             }
         }
 
+        if (gs.children && gs.children.length === 0 || gsParent.isWolf && gs.wolfHasWon) {
+            gs.score = MAX_SCORE;
+            gs.children = null;
+        }
+
         this.score = gs.trueScore;
         this.elapsed = new Date().getTime() - startDate.getTime();
-        this.statusString = `${gs.nbMoves.toString().padStart(2)}: ${gs.getPlayerId(true)} Score:${gs.trueScore.toString().padStart(5)} Wolf:${gs.wolf} Sheep:${gs.sheep} Nb:${this.nbIterations} Time:${this.elapsed}`;
+        this.statusString = `${gs.nbMoves.toString().padStart(2)}: ${gs.getPlayerId(true)} score:${gs.trueScore.toString().padStart(5)} wolf:${gs.wolf} sheep:${gs.sheep} nb:${this.nbIterations} nbPlay:${this.nbPlay} nbFound:${this.nbFound} time:${this.elapsed}`;
 
-        this.dictTmp = {};
+        console.log(this.statusString, gs);
 
         gsParent.children = null;
-        //gs.children = null;   // unnecessary as it is already null.
+        gs.children = null;     // keep nothing for next play, along with reset().
 
         return gs;
     }
@@ -64,53 +84,69 @@ export class Solver {
     private negaMax(gsParent: GameState, depth: number, alpha: number, beta: number): number {
         ++this.nbIterations;
 
-        let states = gsParent.play();
+        let states = gsParent.children;
 
-        if (depth === 0)
-            gsParent.children = states;
+        if (!states) {
+            ++this.nbPlay;
 
-        if (states.length === 0)
-            return -MAX_SCORE + depth - 1;	// substract -1 because sheep has won on previous move (wold is blocked).
+            gsParent.children = states = gsParent.play().map(gs => {
+                let hash = gs.getHash();
+                let found = this.dictTmp[hash];
+
+                if (found) {
+                    gs = found;
+                    ++this.nbFound;
+                } else {
+                    this.dictTmp[hash] = gs;
+                }
+
+                return gs;
+            });
+        }
+
+        if (states.length === 0) {
+            let score = -MAX_SCORE + gsParent.nbMoves;
+            return score;
+        }
 
         let wolfTurn = gsParent.isWolf;	// true if wolf plays this turn
 
         for (let gsChild of states) {
-            let score = undefined;
+            let x = 0;
 
-            if (wolfTurn) {
-                if (gsChild.wolfHasWon)			// wolf play and win
-                    score = MAX_SCORE - depth;		// 		=> if depth = 0 : perfect score
-                else if (gsChild.wolfWillWin)
-                    score = MAX_SCORE - depth - gsChild.deltaWolfToLowestSheep;
+            if (gsChild.wolfHasWon)			                                // wolf play and win
+                x = MAX_SCORE - gsChild.nbMoves;
+            else if (gsChild.children && gsChild.children.length === 0)     // sheep won.
+                x = -MAX_SCORE + gsChild.nbMoves;
+            else if (gsChild.isSheepBest)	                                // sheep : perfect move
+                x = -800 - gsChild.nbMoves;
+            else if (gsChild.wolfWillWin)
+                x = MAX_SCORE - gsChild.nbMoves; - gsChild.deltaWolfToLowestSheep * 2;
+
+            if (!wolfTurn) {
+                x = -x;
             }
-            else if (gsChild.isSheepBest)	// sheep : perfect move
-                score = 800 + depth;
 
-            if (score !== undefined) {
-                this.dictTmp[gsParent.getHash()] = -score;	//negate the score before store so it is not necessary to do this after retrieving from dictionary
-                return gsChild.score = score;
+            if (x)
+                gsChild.score = x;
+
+            if (x >= 800) {
+                gsParent.children = [gsChild];  // keep only best move
+                return x;
             }
         }
 
         let max = MIN_SCORE;
-        let smax = MAX_SCORE - depth;
-        let okPrune = depth < this.pruneDepth;
-        let okDict = depth >= this.pruneDepth;
-
 
         for (let gsChild of states) {
-            let x: number;
-            if (!wolfTurn && gsChild.wolfHasWon)
-                x = -MAX_SCORE + depth + 1;									// sheep bad move, wolf win on next turn.
-            else if (!wolfTurn && gsChild.wolfWillWin)
-                x = -MAX_SCORE + depth + gsChild.deltaWolfToLowestSheep;	//sheep has played but wolf will win soon.
+            let x = gsChild.score;
+
+            if (x !== undefined) {
+                // Use x OK
+            }
             else if (depth === this.maxDepth)
                 x = 0;
-            else if (smax <= alpha)
-                x = smax;
-            else if ((x = this.dictTmp[gsChild.getHash()]) !== undefined) {
-                //use x from dictionary
-            } else
+            else
                 x = -this.negaMax(gsChild, depth + 1, -beta, -alpha);
 
             gsChild.score = x;
@@ -118,16 +154,14 @@ export class Solver {
             if (x > alpha) {
                 alpha = x;
 
-                if (okPrune && alpha >= beta)
+                if (alpha >= beta) {
                     return alpha;
+                }
             }
 
             if (x > max)
                 max = x;
         }
-
-        if (okDict)
-            this.dictTmp[gsParent.getHash()] = -max;	//negate the score before store so it is not necessary to do this after retrieving from dictionary
 
         return max;
     }
