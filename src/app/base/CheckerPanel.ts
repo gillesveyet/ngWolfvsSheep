@@ -229,7 +229,7 @@ export class CheckerPanel {
         if (!Pos.isValid(x, y))
             return;
 
-        let p = Pos.GetPos(x, y);
+        let p = Pos.getPos(x, y);
 
         //console.log('canvas_MouseClick - x=' + x + ' y=' + y + ' p=' + p + ' this.Selected=' + this.selectedPiece); // + ' - onMovePiece: ' + this.onMovePiece);
 

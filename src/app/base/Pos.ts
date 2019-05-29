@@ -24,10 +24,10 @@ export class Pos {
 	private static _allPos: Pos[][] = [];
 
 	private static Ctor = (() => {
-		Pos.Init();
+		Pos.init();
 	})();
 
-	static Init(): void {
+	static init(): void {
 		for (let x = 0; x < 10; ++x) {
 			Pos._allPos[x] = [];
 
@@ -36,7 +36,7 @@ export class Pos {
 		}
 	}
 
-	static GetPos(x: number, y: number) {
+	static getPos(x: number, y: number) {
 		return Pos._allPos[x][y];
 	}
 
@@ -87,21 +87,21 @@ export class Pos {
 		if (y % 2 === 0) {
 			if (x < 9)
 				//result.push(Pos.GetPos(x + 1, y + 1));
-				result[z++] = Pos.GetPos(x + 1, y + 1);
+				result[z++] = Pos.getPos(x + 1, y + 1);
 
 			if (x > 0)
 				//result.push(Pos.GetPos(x - 1, y + 1));
-				result[z++] = Pos.GetPos(x - 1, y + 1);
+				result[z++] = Pos.getPos(x - 1, y + 1);
 		}
 		else {
 			//same moves as above but in different order : so that wolf try to remain in center position (X = 4 or x=5)
 			if (x > 0)
 				//result.push(Pos.GetPos(x - 1, y + 1));
-				result[z++] = Pos.GetPos(x - 1, y + 1);
+				result[z++] = Pos.getPos(x - 1, y + 1);
 
 			if (x < 9)
 				//result.push(Pos.GetPos(x + 1, y + 1));
-				result[z++] = Pos.GetPos(x + 1, y + 1);
+				result[z++] = Pos.getPos(x + 1, y + 1);
 		}
 
 		//}
@@ -109,11 +109,11 @@ export class Pos {
 		if (y > 0) {
 			if (x < 9)
 				//result.push(Pos.GetPos(x + 1, y - 1));
-				result[z++] = Pos.GetPos(x + 1, y - 1);
+				result[z++] = Pos.getPos(x + 1, y - 1);
 
 			if (x > 0)
 				//result.push(Pos.GetPos(x - 1, y - 1));
-				result[z++] = Pos.GetPos(x - 1, y - 1);
+				result[z++] = Pos.getPos(x - 1, y - 1);
 		}
 
 		return result;
@@ -129,22 +129,22 @@ export class Pos {
 			if (y % 2 === 0) {
 				if (x > 0)
 					//result.push(Pos.GetPos(x - 1, y - 1));
-					result[z++] = Pos.GetPos(x - 1, y - 1);
+					result[z++] = Pos.getPos(x - 1, y - 1);
 
 				if (x < 9)
 					//result.push(Pos.GetPos(x + 1, y - 1));
-					result[z++] = Pos.GetPos(x + 1, y - 1);
+					result[z++] = Pos.getPos(x + 1, y - 1);
 			}
 			else {
 				//same moves as above but in different order : so that sheep do not leave hole
 				if (x < 9)
 					//result.push(Pos.GetPos(x + 1, y - 1));
-					result[z++] = Pos.GetPos(x + 1, y - 1);
+					result[z++] = Pos.getPos(x + 1, y - 1);
 
 
 				if (x > 0)
 					//result.push(Pos.GetPos(x - 1, y - 1));
-					result[z++] = Pos.GetPos(x - 1, y - 1);
+					result[z++] = Pos.getPos(x - 1, y - 1);
 			}
 		}
 

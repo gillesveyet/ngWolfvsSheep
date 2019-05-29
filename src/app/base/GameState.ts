@@ -54,7 +54,7 @@ export class GameState {
                         ++x;
                 }
 
-                sheep[i] = Pos.GetPos(x, 9 - dy);
+                sheep[i] = Pos.getPos(x, 9 - dy);
             }
 
             sheep.sort((a: Pos, b: Pos) => { return a.pval - b.pval; });
@@ -530,7 +530,7 @@ export class GameState {
 
 
     static getInitialGameState() {
-        let gs = new GameState(0, Pos.GetPos(5, 0), [Pos.GetPos(0, 9), Pos.GetPos(2, 9), Pos.GetPos(4, 9), Pos.GetPos(6, 9), Pos.GetPos(8, 9)]);
+        let gs = new GameState(0, Pos.getPos(5, 0), [Pos.getPos(0, 9), Pos.getPos(2, 9), Pos.getPos(4, 9), Pos.getPos(6, 9), Pos.getPos(8, 9)]);
         return gs;
     }
 
@@ -785,13 +785,13 @@ export class GameState {
                 let p: Pos;
 
                 if (x > wx) {
-                    p = Pos.GetPos(x - 1, y - 1);
+                    p = Pos.getPos(x - 1, y - 1);
                 }
                 else {
                     if (x === 9)
                         continue;
 
-                    p = Pos.GetPos(x + 1, y - 1);
+                    p = Pos.getPos(x + 1, y - 1);
                 }
 
                 if (p === this.wolf || p === S0 || p === S1 || p === S2 || p === S3 || p === S4)
@@ -815,13 +815,13 @@ export class GameState {
                     if (x === 9)
                         continue;
 
-                    p = Pos.GetPos(x + 1, y - 1);
+                    p = Pos.getPos(x + 1, y - 1);
                 }
                 else {
                     if (x === 0)
                         continue;
 
-                    p = Pos.GetPos(x - 1, y - 1);
+                    p = Pos.getPos(x - 1, y - 1);
                 }
 
                 if (p === this.wolf || p === S0 || p === S1 || p === S2 || p === S3 || p === S4)
@@ -835,35 +835,7 @@ export class GameState {
         return list;
     }
 
-    public getHash(): number {
-        //hash is greater than 2^32 but should be ok as numbers are accurate up to 15 digits (IEEE 754 mantissa is 52 bits).
-        return (this.sheep[0].pval + 50) * (this.sheep[1].pval + 50) * (this.sheep[2].pval + 50) * (this.sheep[3].pval + 50) * (this.sheep[4].pval + 50) * 50 + this.wolf.pval;
+    public getHashSheep(): number {
+        return this.sheep[0].pval | this.sheep[1].pval << 6 | this.sheep[2].pval << 12 | this.sheep[3].pval << 18 | this.sheep[4].pval << 24;
     }
-
-
-    // // Compute hash as bit field, seems to be a little faster than original getHash
-    // //  
-    // //   6 : Wolf position  (0 .. 49)
-    // //   6 : Sheep Lowest   (0 .. 49) 
-    // //
-    // // For each remaining sheep (x 4)
-    // //   5 : offset to previous sheep - 1 (offset cannot be 0 so we can substract 1)
-    // public getHash2(): number {
-    // 	let W = this.wolf.pval;
-    // 	let S0 = this.sheep[0].pval;
-    // 	let S1 = this.sheep[1].pval;
-    // 	let S2 = this.sheep[2].pval;
-    // 	let S3 = this.sheep[3].pval;
-    // 	let S4 = this.sheep[4].pval;
-
-    // 	let d0 = S1 - S0 - 1;
-    // 	let d1 = S2 - S1 - 1;
-    // 	let d2 = S3 - S2 - 1;
-    // 	let d3 = S4 - S3 - 1;
-
-    // 	if( d0 > 32 || d1 > 32 || d2 > 32 || d3 > 32)
-    // 		return 0;	// overflow, hash no unique, do not use.
-
-    // 	return W << 26 | S0 << 20 | d0 << 15 | d1 << 10 | d2 << 5 | d3;
-    // }
 }

@@ -22,7 +22,7 @@ import { GameState, NB_SHEEP, MIN_SCORE, MAX_SCORE } from './GameState';
 export class Solver {
     private maxDepth: number;
     private readonly pruneDepth = 10;
-    private dictTmp: HashTable<GameState> = {};
+    private dictTmp: HashTable<GameState>[];
 
     public score: number;
     public elapsed: number;
@@ -32,7 +32,10 @@ export class Solver {
     public statusString: string;
 
     public reset() {
-        this.dictTmp = {};
+        this.dictTmp = [];
+        
+        for (let i = 0; i < 50; ++i)
+            this.dictTmp[i] = {};
     }
 
     public play(gsParent: GameState, maxDepth: number): GameState {
@@ -40,21 +43,20 @@ export class Solver {
         this.nbFound = this.nbPlay = this.nbIterations = 0;
 
         this.reset();
-        let startDate = new Date();
+        let start = performance.now();
 
-        if (gsParent.children && gsParent.children.length === 0) {
-            console.log('bug1', gsParent);
-        }
-
+        // if (gsParent.children && gsParent.children.length === 0) {
+        //     console.log('bug1', gsParent);
+        // }
 
         this.negaMax(gsParent, 0, MIN_SCORE, MAX_SCORE);
 
         let gs: GameState = null;
         let x = MIN_SCORE - 1;
 
-        if (!gsParent.children || gsParent.children.length === 0) {
-            console.log('bug2', gsParent);
-        }
+        // if (!gsParent.children || gsParent.children.length === 0) {
+        //     console.log('bug2', gsParent);
+        // }
 
         for (let gsChild of gsParent.children) {
             if (gsChild.score > x) {
@@ -69,7 +71,7 @@ export class Solver {
         }
 
         this.score = gs.trueScore;
-        this.elapsed = new Date().getTime() - startDate.getTime();
+        this.elapsed = Math.round(performance.now() - start);
         this.statusString = `${gs.nbMoves.toString().padStart(2)}: ${gs.getPlayerId(true)} score:${gs.trueScore.toString().padStart(5)} wolf:${gs.wolf} sheep:${gs.sheep} nb:${this.nbIterations} nbPlay:${this.nbPlay} nbFound:${this.nbFound} time:${this.elapsed}`;
 
         console.log(this.statusString, gs);
@@ -90,14 +92,15 @@ export class Solver {
             ++this.nbPlay;
 
             gsParent.children = states = gsParent.play().map(gs => {
-                let hash = gs.getHash();
-                let found = this.dictTmp[hash];
+                let hash = gs.getHashSheep();
+                let w = gs.wolf.pval;
+                let found = this.dictTmp[w][hash];
 
                 if (found) {
                     gs = found;
                     ++this.nbFound;
                 } else {
-                    this.dictTmp[hash] = gs;
+                    this.dictTmp[w][hash] = gs;
                 }
 
                 return gs;
@@ -112,23 +115,27 @@ export class Solver {
         let wolfTurn = gsParent.isWolf;	// true if wolf plays this turn
 
         for (let gsChild of states) {
-            let x = 0;
+            let x = gsChild.score;
 
-            if (gsChild.wolfHasWon)			                                // wolf play and win
-                x = MAX_SCORE - gsChild.nbMoves;
-            else if (gsChild.children && gsChild.children.length === 0)     // sheep won.
-                x = -MAX_SCORE + gsChild.nbMoves;
-            else if (gsChild.isSheepBest)	                                // sheep : perfect move
-                x = -800 - gsChild.nbMoves;
-            else if (gsChild.wolfWillWin)
-                x = MAX_SCORE - gsChild.nbMoves; - gsChild.deltaWolfToLowestSheep * 2;
+            if (x === undefined || x <= beta) {
+                x = 0;
 
-            if (!wolfTurn) {
-                x = -x;
+                if (gsChild.wolfHasWon)			                                // wolf play and win
+                    x = MAX_SCORE - gsChild.nbMoves;
+                else if (gsChild.children && gsChild.children.length === 0)     // sheep won.
+                    x = -MAX_SCORE + gsChild.nbMoves;
+                else if (gsChild.isSheepBest)	                                // sheep : perfect move
+                    x = -800 - gsChild.nbMoves;
+                else if (gsChild.wolfWillWin)
+                    x = MAX_SCORE - gsChild.nbMoves; - gsChild.deltaWolfToLowestSheep * 2;
+
+                if (!wolfTurn) {
+                    x = -x;
+                }
+
+                if (x)
+                    gsChild.score = x;
             }
-
-            if (x)
-                gsChild.score = x;
 
             if (x >= 800) {
                 gsParent.children = [gsChild];  // keep only best move
