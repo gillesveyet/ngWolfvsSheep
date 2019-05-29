@@ -82,7 +82,13 @@ export class AppComponent {
 
     handleExpertPlay() {
         let gs = this.getGS();
-        if (gs && !gs.isGameOver && this.autoplay && this.autoplayPaused && this.ready) {
+        if (!(gs && !gs.isGameOver && this.autoplay))
+            return;
+
+        if (!this.autoplayPaused) {
+            this.autoplayPaused = true;
+        }
+        else if (this.ready) {
             this.makeCpuPlay();
         }
     }
