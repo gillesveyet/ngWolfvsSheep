@@ -38,7 +38,7 @@ export class AppComponent {
     }
 
 
-    @ViewChild('canBoard') canvasRef: ElementRef;
+    @ViewChild('canBoard', { static: true }) canvasRef: ElementRef;
 
     ngOnInit() {
         window['bench'] = Bench;
