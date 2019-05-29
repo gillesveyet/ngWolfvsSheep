@@ -41,6 +41,8 @@ export class AppComponent {
     @ViewChild('canBoard') canvasRef: ElementRef;
 
     ngOnInit() {
+        window['bench'] = Bench;
+
         this.checker = new CheckerPanel(this.canvasRef.nativeElement);
 
         this.checker.onGetValidMoves = (selected: Pos) => {
@@ -194,7 +196,7 @@ export class AppComponent {
         //Chrome Settings / Advanced Settings / Content Settings : Do not allow any site to show popups - Manage exceptions
         let wnd = window.open('', 'Benchmark');
         this.ready = false;
-        Bench.Run(wnd, this.settings);
+        Bench.run(wnd, this.settings);
         this.ready = true;
     }
 
