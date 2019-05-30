@@ -1,4 +1,3 @@
-import { HashTable } from './Helper';
 import { Model, PlayerMode } from './Model';
 import { Pos } from './Pos';
 
@@ -15,7 +14,7 @@ export const MIN_SCORE = -MAX_SCORE;
 
 export class GameState {
     private static sheepBest: Pos[][];
-    private static DictWolf: HashTable<number> = {};
+    private static mapWolfWin = new Map<number, number>();
 
     private static Ctor = (() => {
         GameState.initSheepBest();
@@ -453,6 +452,7 @@ export class GameState {
             ' _ O'
         ];
 
+        let mapWolf = GameState.mapWolfWin;
 
         for (let ip = 0; ip < patterns.length; ++ip) {
             let pattern = patterns[ip];
@@ -521,10 +521,10 @@ export class GameState {
                 hash2 += 1 << 25;		// bit 25 : 0 = left side,  1 =right side
             }
 
-            GameState.DictWolf[hash1] = nbRow;
+            mapWolf.set(hash1, nbRow);
 
             if (alt)
-                GameState.DictWolf[hash2] = nbRow;
+                mapWolf.set(hash2, nbRow);
         }
     }
 
@@ -749,7 +749,7 @@ export class GameState {
         else if (wx + dyMax > 9)
             hash += (1 << 25) + (wx + dyMax - 9 << 26);		// 1 << 25 + shift << 26
 
-        return GameState.DictWolf[hash] !== undefined;
+        return GameState.mapWolfWin.get(hash) !== undefined;
     }
 
     public play(): GameState[] {

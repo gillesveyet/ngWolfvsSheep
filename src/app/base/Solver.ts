@@ -1,7 +1,6 @@
-import { HashTable } from './Helper';
 import { Pos } from './Pos';
-
 import { GameState, NB_SHEEP, MIN_SCORE, MAX_SCORE } from './GameState';
+import { mapToMapExpression } from '@angular/compiler/src/render3/util';
 
 //Reference: An Introduction to Game Tree Algorithms : http://www.hamedahmadi.com/gametree/
 //
@@ -22,7 +21,7 @@ import { GameState, NB_SHEEP, MIN_SCORE, MAX_SCORE } from './GameState';
 export class Solver {
     private maxDepth: number;
     private readonly pruneDepth = 10;
-    private dictTmp: HashTable<GameState>[];
+    private mapGameState: Map<number,GameState>[];
 
     public score: number;
     public elapsed: number;
@@ -32,10 +31,10 @@ export class Solver {
     public statusString: string;
 
     public reset() {
-        this.dictTmp = [];
+        this.mapGameState = [];
         
         for (let i = 0; i < 50; ++i)
-            this.dictTmp[i] = {};
+            this.mapGameState[i] = new Map<number,GameState>();
     }
 
     public play(gsParent: GameState, maxDepth: number): GameState {
@@ -94,13 +93,13 @@ export class Solver {
             gsParent.children = states = gsParent.play().map(gs => {
                 let hash = gs.getHashSheep();
                 let w = gs.wolf.pval;
-                let found = this.dictTmp[w][hash];
+                let found = this.mapGameState[w].get(hash);
 
                 if (found) {
                     gs = found;
                     ++this.nbFound;
                 } else {
-                    this.dictTmp[w][hash] = gs;
+                    this.mapGameState[w].set(hash,gs);
                 }
 
                 return gs;
