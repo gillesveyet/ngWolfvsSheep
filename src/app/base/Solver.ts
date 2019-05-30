@@ -21,7 +21,7 @@ import { mapToMapExpression } from '@angular/compiler/src/render3/util';
 export class Solver {
     private maxDepth: number;
     private readonly pruneDepth = 10;
-    private mapGameState: Map<number,GameState>[];
+    private mapGameState: Map<number, GameState>[];
 
     public score: number;
     public elapsed: number;
@@ -30,11 +30,15 @@ export class Solver {
     public nbFound: number;
     public statusString: string;
 
+    constructor() {
+        this.reset();
+    }
+
     public reset() {
         this.mapGameState = [];
-        
+
         for (let i = 0; i < 50; ++i)
-            this.mapGameState[i] = new Map<number,GameState>();
+            this.mapGameState[i] = new Map<number, GameState>();
     }
 
     public play(gsParent: GameState, maxDepth: number): GameState {
@@ -85,26 +89,23 @@ export class Solver {
     private negaMax(gsParent: GameState, depth: number, alpha: number, beta: number): number {
         ++this.nbIterations;
 
-        let states = gsParent.children;
+        //gsParent.children is null. If children not null then score is not null so negaMax is not called.
+        let states = gsParent.children = gsParent.play().map(gs => {
+            let hash = gs.getHashSheep();
+            let w = gs.wolf.pval;
+            let found = this.mapGameState[w].get(hash);
 
-        if (!states) {
             ++this.nbPlay;
 
-            gsParent.children = states = gsParent.play().map(gs => {
-                let hash = gs.getHashSheep();
-                let w = gs.wolf.pval;
-                let found = this.mapGameState[w].get(hash);
+            if (found) {
+                gs = found;
+                ++this.nbFound;
+            } else {
+                this.mapGameState[w].set(hash, gs);
+            }
 
-                if (found) {
-                    gs = found;
-                    ++this.nbFound;
-                } else {
-                    this.mapGameState[w].set(hash,gs);
-                }
-
-                return gs;
-            });
-        }
+            return gs;
+        });
 
         if (states.length === 0) {
             let score = -MAX_SCORE + gsParent.nbMoves;

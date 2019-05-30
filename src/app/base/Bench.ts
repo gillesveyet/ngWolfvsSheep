@@ -18,8 +18,6 @@ export class Bench {
         let gs = GameState.getInitialGameState();
 
         for (; !gs.isGameOver;) {
-            solver = new Solver();
-
             gs = solver.play(gs, gs.isWolf ? settings.wolfDepth : settings.sheepDepth);
 
             tsTotal += solver.elapsed;
