@@ -22,7 +22,6 @@ enum Autoplay {
 })
 export class AppComponent {
     status: string;
-    debug: string;
 
     isExpertMode = false;
     showMenuPlay = true;
@@ -104,7 +103,6 @@ export class AppComponent {
 
         let auto = this.autoplay === Autoplay.Run;
 
-        // this.displayDebug(this.solver.statusString);
         this.checker.setPositions(gs, !auto);
         this.displayInfo();
         this.busy = false;
@@ -202,11 +200,7 @@ export class AppComponent {
     displayStatus(msg: string) {
         this.status = msg;
     }
-
-    // displayDebug(msg: string) {
-    //     this.debug = msg;
-    // }
-
+ 
     onPlaySheep() {
         this.startGame(PlayerMode.PlaySheep);
     }

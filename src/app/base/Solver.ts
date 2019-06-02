@@ -1,5 +1,4 @@
-import { Pos } from './Pos';
-import { GameState, NB_SHEEP, MIN_SCORE, MAX_SCORE } from './GameState';
+import { GameState, MIN_SCORE, MAX_SCORE } from './GameState';
 
 //Reference: An Introduction to Game Tree Algorithms : http://www.hamedahmadi.com/gametree/
 //
@@ -29,9 +28,10 @@ export class Solver {
     public nbFound: number;
     public statusString: string;
 
-    constructor() {
-        this.reset();
-    }
+    // reset is currently done at start of play() so it is not needed in constructor.
+    // constructor() {
+    //     this.reset();
+    // }
 
     public reset() {
         this.mapGameState = [];
@@ -79,7 +79,7 @@ export class Solver {
         console.log(this.statusString, gs);
 
         gsParent.children = null;
-        gs.children = null;     // keep nothing for next play, along with reset().
+        gs.children = null;     // keep nothing for next play at the moment. See also reset() above in this method.
 
         return gs;
     }
