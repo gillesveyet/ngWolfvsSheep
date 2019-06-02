@@ -1,3 +1,14 @@
+$font: Roboto, "Helvetica Neue", sans-serif;
+
+// css rules added by ng add @angular/material  Not useful? 
+// html,body {
+//     height: 100%;
+// }
+// body {
+//     margin: 0;
+//     font-family: $font;
+// }
+
 .page {
     display: flex;
     flex-direction: column;
@@ -17,7 +28,7 @@
 .header {
     width: 100%;
     z-index: 1;
-    font: 15px arial, sans-serif;
+    font: 15px $font;
 
     h3 {
         margin-bottom: 8px;
@@ -26,6 +37,13 @@
     a:hover {
         text-decoration: underline;
     }
+}
+
+.content,
+.menu,
+.setting,
+.status {
+    font-family: $font;
 }
 
 .content {
@@ -47,7 +65,7 @@
 }
 
 .menu {
-    background-color: azure;
+    //background-color: azure;
     display: flex;
     flex-direction: row;
 
@@ -57,7 +75,7 @@
 }
 
 .settings {
-    background-color: lightskyblue;
+    //background-color: lightskyblue;
     display: flex;
     flex-direction: row;
 
@@ -77,5 +95,6 @@
 }
 
 .status {
-    background-color: lightgreen;
+    //background-color: lightgreen;
+    margin-left: 10px;
 }

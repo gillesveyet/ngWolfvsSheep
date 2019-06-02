@@ -1,4 +1,5 @@
 import { Component, HostListener, ViewChild, ElementRef } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { GameState, GameStatus, IGameState } from './base/GameState';
 import { Model, PlayerMode } from './base/Model';
 import { CheckerPanel } from './base/CheckerPanel';
@@ -55,6 +56,16 @@ export class AppComponent {
     }
 
     @ViewChild('canBoard', { static: true }) canvasRef: ElementRef;
+
+    constructor(
+        private route: ActivatedRoute
+    ) {
+        this.route.queryParams.subscribe(params => {
+            //note: this is called twice on app startup
+            this.isExpertMode = params['expert'] !== undefined;
+            console.log(`isExpertMode:${this.isExpertMode} params:`, params);
+        });
+    }
 
     ngOnInit() {
         window['bench'] = Bench;
@@ -200,7 +211,7 @@ export class AppComponent {
     displayStatus(msg: string) {
         this.status = msg;
     }
- 
+
     onPlaySheep() {
         this.startGame(PlayerMode.PlaySheep);
     }
