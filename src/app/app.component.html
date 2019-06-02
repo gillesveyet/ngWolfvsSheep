@@ -15,8 +15,8 @@
                 <button (click)="onPlayAuto()">Auto Play</button>
             </div>
 
-            <button *ngIf="autoplay && !autoplayPaused" (click)="onAutoplayPause()">Pause Auto Play</button>
-            <button *ngIf="autoplay && autoplayPaused" [disabled]="isGameOver" (click)="onAutoplayResume()">Resume Auto Play</button>
+            <button *ngIf="isAutoplayRun" [disabled]="isGameOver" (click)="onAutoplayPause()">Pause Auto Play</button>
+            <button *ngIf="isAutoplayOn && !isAutoplayRun" [disabled]="isGameOver || isAutoplayPausing" (click)="onAutoplayResume()">Resume Auto Play</button>
 
             <button *ngIf="showMenuGame" [disabled]="!isGameBackEnabled" (click)="onGameBack()">Move Back</button>
             <button *ngIf="showMenuGame" (click)="onGameNew()">New Game</button>

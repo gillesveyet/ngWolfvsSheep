@@ -1,4 +1,4 @@
-﻿import { GameState } from './GameState';
+﻿import { IGameState } from './GameState';
 import { Pos } from './Pos';
 import { Observable } from 'rxjs';
 
@@ -18,7 +18,7 @@ export class CheckerPanel {
     public onGetValidMoves: (selected: Pos) => Pos[];
     public onMovePiece: (oldPos: Pos, newPos: Pos) => void;
 
-    private gameState: GameState;
+    private gameState: IGameState;
     private isPlayEnabled: boolean;
     private selectedPiece: Pos = null;
     private validMoves: Pos[] = null;
@@ -71,7 +71,7 @@ export class CheckerPanel {
         });
     }
 
-    setPositions(gs: GameState, enablePlay: boolean): void {
+    setPositions(gs: IGameState, enablePlay: boolean): void {
         this.selectedPiece = null;
         this.validMoves = null;
 

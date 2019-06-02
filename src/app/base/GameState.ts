@@ -12,7 +12,19 @@ export const MAX_SCORE = 1000;
 export const MIN_SCORE = -MAX_SCORE;
 
 
-export class GameState {
+export interface IGameState {
+    readonly nbMoves: number;
+    readonly isWolf: boolean;
+    readonly wolf: Pos;
+    readonly sheep: Pos[];
+    readonly isGameOver: boolean;
+    readonly status: GameStatus
+
+    makePlayerMove(oldp: Pos, newp: Pos): GameState;
+    getValidMoves(selected: Pos): Pos[];
+}
+
+export class GameState implements IGameState {
     private static sheepBest: Pos[][];
     private static mapWolfWin = new Map<number, number>();
 
@@ -546,6 +558,12 @@ export class GameState {
         this.isWolf = nbMoves % 2 === 0;
         this.wolf = wolf;
         this.sheep = sheep;
+    }
+
+    static clone(gs: GameState): GameState {
+        let result = new GameState(gs.nbMoves, Pos.clone(gs.wolf), gs.sheep.map(p => Pos.clone(p)));
+        result.score = gs.score;
+        return result;
     }
 
     get hasWolfPlayed(): boolean {
