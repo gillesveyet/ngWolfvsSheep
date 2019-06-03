@@ -1,6 +1,6 @@
-$font: Roboto, "Helvetica Neue", sans-serif;
+$font: Roboto, 'Helvetica Neue', sans-serif;
 
-// css rules added by ng add @angular/material  Not useful? 
+// css rules added by ng add @angular/material  Not useful?
 // html,body {
 //     height: 100%;
 // }
@@ -32,6 +32,10 @@ $font: Roboto, "Helvetica Neue", sans-serif;
 
     h3 {
         margin-bottom: 8px;
+    }
+
+    a {
+        text-decoration: none;
     }
 
     a:hover {
