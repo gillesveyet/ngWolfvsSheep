@@ -25,19 +25,20 @@
         <div *ngIf="isExpertMode" class="settings">
             <div class="setting">
                 <label>Wolf depth</label>
-                <input type="number" [(ngModel)]="settings.wolfDepth">
+                <input type="number" step="1" [(ngModel)]="settings.wolfDepth">
             </div>
 
             <div class="setting">
                 <label>Sheep depth</label>
-                <input type="number" [(ngModel)]="settings.sheepDepth">
+                <input type="number" step="1" [(ngModel)]="settings.sheepDepth">
             </div>
 
             <button (click)="onBenchmark()">Benchmark</button>
         </div>
 
         <div class="board">
-            <canvas #canBoard class="can-board" width="600" height="600"> </canvas>
+            <mat-spinner *ngIf="showSpinner" [diameter]="200" [color]="'accent'" class="spinner"></mat-spinner>
+            <canvas #canBoard class="can-board" width="600" height="600"></canvas>
         </div>
 
         <div class="status">

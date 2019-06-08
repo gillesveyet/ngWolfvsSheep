@@ -5,3 +5,9 @@
     //Note: canvas drawing surface (600x600) is and can only set in HTML.
     width: 100%;
 }
+
+.board > .spinner {
+    position: absolute;
+    top: 30%;
+    left: 30%;
+}

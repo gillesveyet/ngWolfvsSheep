@@ -26,6 +26,7 @@ export class AppComponent {
 
     isExpertMode = false;
     showMenuPlay = true;
+    showSpinner= false;
     autoplay: Autoplay = Autoplay.Off;
     autoplayDelay = 150;    // delay in ms.
     settings = { wolfDepth: DEFAULT_DEPTH, sheepDepth: DEFAULT_DEPTH };
@@ -117,6 +118,7 @@ export class AppComponent {
         this.checker.setPositions(gs, !auto);
         this.displayInfo();
         this.busy = false;
+        this.showSpinner = false;
 
         if (auto)
             this.makeAutoplay();
@@ -140,7 +142,7 @@ export class AppComponent {
     }
 
     makeCpuPlay(): void {
-        this.checker.showWaitLayer();
+        this.showSpinner = true;
         this.displayStatus('Computer is thinking...');
         this.cpuPlay();
     }
