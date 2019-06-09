@@ -2,15 +2,15 @@ $font: Roboto, "Helvetica Neue", sans-serif;
 
 // css rules added by ng add @angular/material
 // See "Height transfer" explanation: http://book.mixu.net/css/5-tricks.html
-html,
-body {
-    height: 100%;
-}
+// html,
+// body {
+//     height: 100%;
+// }
 
-body {
-    margin: 0;
-    font-family: $font;
-}
+// body {
+//     margin: 0;
+//     font-family: $font;
+// }
 
 .page {
     display: flex;

@@ -1,10 +1,15 @@
 import { Component, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { Observable, Observer, of } from "rxjs";
+
 import { GameState, GameStatus, IGameState } from './base/GameState';
 import { Model, PlayerMode } from './base/Model';
 import { CheckerPanel } from './base/CheckerPanel';
 import { Bench } from './base/Bench';
 import { Pos } from './base/Pos';
+import { NewGameComponent } from './views/new-game/new-game.component';
+import { EndGameComponent, EndGameDialogData } from './views/end-game/end-game.component';
 
 
 const DEFAULT_DEPTH = 17;
@@ -26,7 +31,7 @@ export class AppComponent {
 
     isExpertMode = false;
     showMenuPlay = true;
-    showSpinner= false;
+    showSpinner = false;
     autoplay: Autoplay = Autoplay.Off;
     autoplayDelay = 150;    // delay in ms.
     settings = { wolfDepth: DEFAULT_DEPTH, sheepDepth: DEFAULT_DEPTH };
@@ -59,6 +64,7 @@ export class AppComponent {
     @ViewChild('canBoard', { static: true }) canvasRef: ElementRef;
 
     constructor(
+        public dialog: MatDialog,
         private route: ActivatedRoute
     ) {
         this.route.queryParams.subscribe(params => {
@@ -115,7 +121,7 @@ export class AppComponent {
 
         let auto = this.autoplay === Autoplay.Run;
 
-        this.checker.setPositions(gs, !auto);
+        this.checker.setPositions(gs, !gs.isGameOver && !auto);
         this.displayInfo();
         this.busy = false;
         this.showSpinner = false;
@@ -132,7 +138,8 @@ export class AppComponent {
         setTimeout(() => {
             if (this.autoplay === Autoplay.Pausing) {
                 this.autoplay = Autoplay.Paused;
-                this.checker.setPositions(this.getGS(), true);
+                let gs = this.getGS();
+                this.checker.setPositions(gs, !gs.isGameOver);
                 this.displayInfo();
                 return;
             }
@@ -256,11 +263,25 @@ export class AppComponent {
     }
 
     onGameNew() {
-        if (!this.isGameOver && !confirm('Cancel current game and start a new game?'))
-            return;
-
-        this.resetGame();
+        (this.isGameOver ? of(true) : this.confirmNewGame()).subscribe(result => {
+            if (result)
+                this.resetGame();
+        });
     }
+
+    confirmNewGame(): Observable<boolean> {
+        return Observable.create((observer: Observer<boolean>) => {
+
+            const dialogRef = this.dialog.open(NewGameComponent);
+
+            dialogRef.afterClosed().subscribe(result => {
+                console.log(`NewGame dialog result:${result}`);
+                observer.next(result);
+                observer.complete();
+            });
+        });
+    }
+
 
     onBenchmark() {
         //from http://en.nisi.ro/blog/development/javascript/open-new-window-window-open-seen-chrome-popup/
@@ -306,23 +327,29 @@ export class AppComponent {
         }
     }
 
-
     showVictory(gs: IGameState): void {
         let msg: string;
 
         if (this.isTwoPlayerMode) {
             if (gs.status === GameStatus.SheepWon)
-                msg = 'Sheep win!';
+                msg = 'Sheep won!';
             else
-                msg = 'Wolf wins!';
+                msg = 'Wolf won!';
         } else {
             if ((gs.status === GameStatus.WolfWon) === (this.playerMode === PlayerMode.PlayWolf))
-                msg = 'You win!';
+                msg = 'You won!';
             else
-                msg = 'You lose!';
+                msg = 'You lost!';
         }
 
         this.displayStatus(msg);
-        setTimeout(() => alert(msg), 150);
+
+        let dialogData: EndGameDialogData = { message: msg };
+
+        setTimeout(() =>
+            this.dialog.open(EndGameComponent, { data: dialogData }),
+            150);
     }
+
+
 }
