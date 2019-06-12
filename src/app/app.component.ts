@@ -62,6 +62,7 @@ export class AppComponent {
     }
 
     @ViewChild('canBoard', { static: true }) canvasRef: ElementRef;
+    @ViewChild('fileSaver', { static: true }) fileSaver: ElementRef;
 
     constructor(
         public dialog: MatDialog,
@@ -291,6 +292,43 @@ export class AppComponent {
         this.busy = true;
         Bench.run(wnd, this.settings);
         this.busy = true;
+    }
+
+
+    onSave() {
+        let fs: HTMLInputElement = this.fileSaver.nativeElement;
+
+        let url = window.URL.createObjectURL(new Blob([JSON.stringify(this.gameHistory)], { type: "application/json;charset=utf-8" }));
+        fs.setAttribute('href', url);
+        fs.setAttribute('download', 'game.json');
+        fs.click();
+
+        window.URL.revokeObjectURL(url);
+    }
+
+
+    onFileLoader(e: any) {
+        if (!e.target.files || !e.target.files[0])
+            return;
+
+        let file = e.target.files[0];
+        let reader = new FileReader();
+
+        reader.onload = () => {
+            if (this.showMenuPlay) {
+                this.showMenuPlay = false;
+                this.playerMode = PlayerMode.TwoPlayers;
+                this.autoplay = Autoplay.Paused;
+            }
+
+            this.gameHistory = JSON.parse(<string>reader.result).map(gs => GameState.clone(gs));
+            let gs = this.getGS();
+            this.checker.setPositions(gs, !gs.isGameOver);
+            this.displayInfo();
+        }
+
+        reader.readAsText(file);
+        e.target.value = null;  // set to null otherwise change event is not fired when selecting same file.
     }
 
     startGame(mode: PlayerMode, autoplay = false): void {

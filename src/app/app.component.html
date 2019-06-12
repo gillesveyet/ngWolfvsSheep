@@ -9,6 +9,8 @@
     </div>
 
     <div class="content">
+        <a #fileSaver style="display:none"></a>
+        <input #fileLoader type="file" accept=".json" style="display:none" (change)="onFileLoader($event)"/>
 
         <div class="menu">
             <div *ngIf="showMenuPlay">
@@ -37,6 +39,8 @@
             </div>
 
             <button (click)="onBenchmark()">Benchmark</button>
+            <button (click)="fileLoader.click()">Load</button>
+            <button (click)="onSave()">Save</button>
         </div>
 
         <div class="board">
