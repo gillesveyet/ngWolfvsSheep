@@ -1,64 +1,65 @@
-<div class="page">
+<div class="view">
+    <div class="page">
 
-    <div class="header">
-        <mat-toolbar color="primary">
-            <mat-toolbar-row>
-                <span>Wolf vs Sheep</span>
-            </mat-toolbar-row>
-        </mat-toolbar>
-    </div>
+        <div class="header">
+            <mat-toolbar color="primary">
+                <mat-toolbar-row>
+                    <span>Wolf vs Sheep</span>
+                </mat-toolbar-row>
+            </mat-toolbar>
+        </div>
 
-    <div class="content">
-        <a #fileSaver style="display:none"></a>
-        <input #fileLoader type="file" accept=".json" style="display:none" (change)="onFileLoader($event)"/>
+        <div class="content">
+            <a #fileSaver style="display:none"></a>
+            <input #fileLoader type="file" accept=".json" style="display:none" (change)="onFileLoader($event)" />
 
-        <div class="menu">
-            <div *ngIf="showMenuPlay">
-                <button mat-raised-button (click)="onPlaySheep()">Play Sheep vs CPU</button>
-                <button mat-raised-button (click)="onPlayWolf()">Play Wolf vs CPU</button>
-                <button mat-raised-button (click)="onPlayTwoPlayers()">2 Players</button>
-                <button mat-raised-button (click)="onPlayAuto()">Auto Play</button>
+            <div class="menu">
+                <div *ngIf="showMenuPlay">
+                    <button mat-raised-button (click)="onPlaySheep()">Play Sheep vs CPU</button>
+                    <button mat-raised-button (click)="onPlayWolf()">Play Wolf vs CPU</button>
+                    <button mat-raised-button (click)="onPlayTwoPlayers()">2 Players</button>
+                    <button mat-raised-button (click)="onPlayAuto()">Auto Play</button>
+                </div>
+
+                <button mat-raised-button *ngIf="isAutoplayRun" [disabled]="isGameOver" (click)="onAutoplayPause()">Pause Auto Play</button>
+                <button mat-raised-button *ngIf="isAutoplayOn && !isAutoplayRun" [disabled]="isGameOver || isAutoplayPausing" (click)="onAutoplayResume()">Resume Auto Play</button>
+
+                <button mat-raised-button *ngIf="showMenuGame" [disabled]="!isGameBackEnabled" (click)="onGameBack()">Move Back</button>
+                <button mat-raised-button *ngIf="showMenuGame" (click)="onGameNew()">New Game</button>
             </div>
 
-            <button mat-raised-button *ngIf="isAutoplayRun" [disabled]="isGameOver" (click)="onAutoplayPause()">Pause Auto Play</button>
-            <button mat-raised-button *ngIf="isAutoplayOn && !isAutoplayRun" [disabled]="isGameOver || isAutoplayPausing" (click)="onAutoplayResume()">Resume Auto Play</button>
+            <div *ngIf="isExpertMode" class="settings">
+                <div class="setting">
+                    <label>Wolf depth</label>
+                    <input type="number" step="1" [(ngModel)]="settings.wolfDepth">
+                </div>
 
-            <button mat-raised-button *ngIf="showMenuGame" [disabled]="!isGameBackEnabled" (click)="onGameBack()">Move Back</button>
-            <button mat-raised-button *ngIf="showMenuGame" (click)="onGameNew()">New Game</button>
-        </div>
+                <div class="setting">
+                    <label>Sheep depth</label>
+                    <input type="number" step="1" [(ngModel)]="settings.sheepDepth">
+                </div>
 
-        <div *ngIf="isExpertMode" class="settings">
-            <div class="setting">
-                <label>Wolf depth</label>
-                <input type="number" step="1" [(ngModel)]="settings.wolfDepth">
+                <button (click)="onBenchmark()">Benchmark</button>
+                <button (click)="fileLoader.click()">Load</button>
+                <button (click)="onSave()">Save</button>
             </div>
 
-            <div class="setting">
-                <label>Sheep depth</label>
-                <input type="number" step="1" [(ngModel)]="settings.sheepDepth">
+            <div class="board">
+                <mat-spinner *ngIf="showSpinner" [diameter]="200" [color]="'accent'" class="spinner"></mat-spinner>
+                <canvas #canBoard class="can-board" width="600" height="600"></canvas>
             </div>
 
-            <button (click)="onBenchmark()">Benchmark</button>
-            <button (click)="fileLoader.click()">Load</button>
-            <button (click)="onSave()">Save</button>
+            <div class="status">
+                <span>{{status}}</span>
+            </div>
+
         </div>
 
-        <div class="board">
-            <mat-spinner *ngIf="showSpinner" [diameter]="200" [color]="'accent'" class="spinner"></mat-spinner>
-            <canvas #canBoard class="can-board" width="600" height="600"></canvas>
-        </div>
-
-        <div class="status">
-            <span>{{status}}</span>
-        </div>
-
-    </div>
-
-    <!-- <div class="footer">
+        <!-- <div class="footer">
         <span>See project on <a href="https://github.com/gillesveyet/ngWolfvsSheep/">github</a></span>
     </div> -->
 
+    </div>
 </div>
-
 
 <router-outlet></router-outlet>

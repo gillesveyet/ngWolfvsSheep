@@ -1,4 +1,4 @@
-$font: Roboto, "Helvetica Neue", sans-serif;
+$font: Roboto, 'Helvetica Neue', sans-serif;
 
 // css rules added by ng add @angular/material
 // See "Height transfer" explanation: http://book.mixu.net/css/5-tricks.html
@@ -12,15 +12,15 @@ $font: Roboto, "Helvetica Neue", sans-serif;
 //     font-family: $font;
 // }
 
+.view {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .page {
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
 }
 
 .header {
