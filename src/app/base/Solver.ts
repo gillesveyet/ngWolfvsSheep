@@ -25,6 +25,7 @@ export class Solver {
     public elapsed: number;
     public nbIterations: number;
     public nbPlay: number;
+    public nbGen: number;
     public nbFound: number;
     public statusString: string;
 
@@ -42,7 +43,7 @@ export class Solver {
 
     public play(gsParent: GameState, maxDepth: number): GameState {
         this.maxDepth = maxDepth - 1;
-        this.nbFound = this.nbPlay = this.nbIterations = 0;
+        this.nbFound = this.nbGen = this.nbPlay = this.nbIterations = 0;
 
         this.reset();
         let start = performance.now();
@@ -74,7 +75,7 @@ export class Solver {
 
         this.score = gs.trueScore;
         this.elapsed = Math.round(performance.now() - start);
-        this.statusString = `${gs.nbMoves.toString().padStart(2)}: ${gs.getPlayerId(true)} score:${gs.trueScore.toString().padStart(5)} wolf:${gs.wolf} sheep:${gs.sheep} nb:${this.nbIterations} nbPlay:${this.nbPlay} nbFound:${this.nbFound} time:${this.elapsed}`;
+        this.statusString = `${gs.nbMoves.toString().padStart(2)}: ${gs.getPlayerId(true)} score:${gs.trueScore.toString().padStart(5)} wolf:${gs.wolf} sheep:${gs.sheep} nb:${this.nbIterations} nbPlay:${this.nbGen} nbFound:${this.nbGen} nbFound:${this.nbFound} time:${this.elapsed}`;
 
         console.log(this.statusString, gs);
 
@@ -88,23 +89,28 @@ export class Solver {
     private negaMax(gsParent: GameState, depth: number, alpha: number, beta: number): number {
         ++this.nbIterations;
 
-        //gsParent.children is null. If children not null then score is not null so negaMax is not called.
-        let states = gsParent.children = gsParent.play().map(gs => {
-            let hash = gs.getHashSheep();
-            let w = gs.wolf.pval;
-            let found = this.mapGameState[w].get(hash);
+        let states = gsParent.children;
 
+        if (!states) {
             ++this.nbPlay;
 
-            if (found) {
-                gs = found;
-                ++this.nbFound;
-            } else {
-                this.mapGameState[w].set(hash, gs);
-            }
+            states = gsParent.children = gsParent.play().map(gs => {
+                ++this.nbGen;
 
-            return gs;
-        });
+                let hash = gs.getHashSheep();
+                let w = gs.wolf.pval;
+                let found = this.mapGameState[w].get(hash);
+
+                if (found) {
+                    gs = found;
+                    ++this.nbFound;
+                } else {
+                    this.mapGameState[w].set(hash, gs);
+                }
+
+                return gs;
+            });
+        }
 
         if (states.length === 0) {
             let score = -MAX_SCORE + gsParent.nbMoves;

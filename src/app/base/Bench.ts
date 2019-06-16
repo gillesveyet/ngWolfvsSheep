@@ -13,6 +13,9 @@ export class Bench {
         let tsTotal = 0;
         let tsMax = 0;
         let nbTotal = 0;
+        let nbPlay = 0;
+        let nbGen = 0;
+        let nbFound = 0;
         let solver = new Solver();
 
         let gs = GameState.getInitialGameState();
@@ -22,6 +25,9 @@ export class Bench {
 
             tsTotal += solver.elapsed;
             nbTotal += solver.nbIterations;
+            nbPlay += solver.nbPlay;
+            nbGen += solver.nbGen;
+            nbFound += solver.nbFound;
 
             if (solver.elapsed > tsMax)
                 tsMax = solver.elapsed;
@@ -31,7 +37,7 @@ export class Bench {
 
         solver.reset();
 
-        res += `Done in ${tsTotal} ms - Max=${tsMax} ms - NbTotal=${nbTotal} - Result:${solver.score} ${GameStatus[gs.status]} ${gs.status === GameStatus.SheepWon ? 'OK' : 'FAIL'}`;
+        res += `Done in ${tsTotal} ms - Max=${tsMax} ms - nbTotal=${nbTotal} - nbPlay=${nbPlay} - nbGen=${nbGen} - nbFound=${nbFound} - Result:${solver.score} ${GameStatus[gs.status]} ${gs.status === GameStatus.SheepWon ? 'OK' : 'FAIL'}`;
 
         if (!win)
             win = window.open('', 'Benchmark');
