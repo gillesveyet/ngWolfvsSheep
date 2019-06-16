@@ -29,6 +29,8 @@ export class Solver {
     public nbFound: number;
     public statusString: string;
 
+    static instance: Solver = new Solver();
+
     // reset is currently done at start of play() so it is not needed in constructor.
     // constructor() {
     //     this.reset();
@@ -80,6 +82,8 @@ export class Solver {
         console.log(this.statusString, gs);
 
         gsParent.children = null;
+
+        //much slower if next line commented out, very strange!
         gs.children = null;     // keep nothing for next play at the moment. See also reset() above in this method.
 
         return gs;
