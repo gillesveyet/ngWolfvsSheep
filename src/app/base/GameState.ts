@@ -551,6 +551,7 @@ export class GameState implements IGameState {
     wolf: Pos;
     sheep: Pos[];
     score: number;
+    final:boolean;
     children: GameState[];
 
     constructor(nbMoves: number, wolf: Pos, sheep: Pos[]) {

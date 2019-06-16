@@ -116,7 +116,7 @@ export class Solver {
         for (let gsChild of states) {
             let x = gsChild.score;
 
-            if (x === undefined || x <= beta) {
+            if (!gsChild.final || x === undefined || x <= beta) {
                 x = 0;
 
                 if (gsChild.wolfHasWon)			                                // wolf play and win
@@ -132,14 +132,17 @@ export class Solver {
                     x = -x;
                 }
 
-                if (x)
+                if (x) {
                     gsChild.score = x;
+                    gsChild.final = true;
+                }
             }
 
             if (x >= 800) {
                 gsParent.children = [gsChild];  // keep only best move
                 return x;
             }
+
         }
 
         let max = MIN_SCORE;
@@ -147,7 +150,7 @@ export class Solver {
         for (let gsChild of states) {
             let x = gsChild.score;
 
-            if (x !== undefined) {
+            if (gsChild.final || x >= beta) {
                 // Use x OK
             }
             else if (depth === this.maxDepth)
