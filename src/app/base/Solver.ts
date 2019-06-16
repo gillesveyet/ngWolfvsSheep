@@ -122,7 +122,7 @@ export class Solver {
         for (let gsChild of states) {
             let x = gsChild.score;
 
-            if (!gsChild.final || x === undefined || x <= beta) {
+            if (!gsChild.final && x < beta) {       // opposite of (gsChild.final || x >= beta).  'x' may be undefined. 
                 x = 0;
 
                 if (gsChild.wolfHasWon)			                                // wolf play and win
