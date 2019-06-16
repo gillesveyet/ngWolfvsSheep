@@ -273,7 +273,7 @@ export class AppComponent {
     confirmNewGame(): Observable<boolean> {
         return Observable.create((observer: Observer<boolean>) => {
 
-            const dialogRef = this.dialog.open(NewGameComponent);
+            const dialogRef = this.dialog.open(NewGameComponent, { position: { top: "200px" } });
 
             dialogRef.afterClosed().subscribe(result => {
                 console.log(`NewGame dialog result:${result}`);
@@ -385,7 +385,7 @@ export class AppComponent {
         let dialogData: EndGameDialogData = { message: msg };
 
         setTimeout(() =>
-            this.dialog.open(EndGameComponent, { data: dialogData }),
+            this.dialog.open(EndGameComponent, { data: dialogData, position: { top: "200px" } }),
             150);
     }
 
