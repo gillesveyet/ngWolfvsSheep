@@ -163,7 +163,7 @@ export class AppComponent {
     onKeydownHandler(evt: KeyboardEvent) {
         switch (evt.which || evt.keyCode || parseInt(evt.code, 10)) {
             case 32: //space key
-                // console.log(`Space pressed`, document.activeElement);
+                //console.log(`Space pressed`, document.activeElement);
                 this.handleExpertPlay();
                 evt.preventDefault();
                 break;
@@ -172,6 +172,8 @@ export class AppComponent {
 
     handleExpertPlay() {
         let gs = this.getGS();
+        //console.log(`handleExpertPlay gs:${gs && !gs.isGameOver} isAutoplayOn:${this.isAutoplayOn} busy:${this.busy}`);
+
         if (!(gs && !gs.isGameOver && this.isAutoplayOn))
             return;
 
@@ -291,7 +293,7 @@ export class AppComponent {
         let wnd = window.open('', 'Benchmark');
         this.busy = true;
         Bench.run(wnd, this.settings);
-        this.busy = true;
+        this.busy = false;
     }
 
 
