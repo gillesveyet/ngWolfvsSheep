@@ -317,14 +317,19 @@ export class AppComponent {
         let reader = new FileReader();
 
         reader.onload = () => {
+            this.gameHistory = JSON.parse(<string>reader.result).map(gs => GameState.clone(gs));
+            let gs = this.getGS();
+
             if (this.showMenuPlay) {
                 this.showMenuPlay = false;
                 this.playerMode = PlayerMode.TwoPlayers;
                 this.autoplay = Autoplay.Paused;
+            } else if (this.playerMode === PlayerMode.PlayWolf && !gs.isWolf || this.playerMode === PlayerMode.PlaySheep && gs.isWolf) {
+                // Current player mode does not match save game so remove last move.
+                this.gameHistory.pop();
+                gs = this.getGS();
             }
 
-            this.gameHistory = JSON.parse(<string>reader.result).map(gs => GameState.clone(gs));
-            let gs = this.getGS();
             this.checker.setPositions(gs, !gs.isGameOver);
             this.displayInfo();
         }
