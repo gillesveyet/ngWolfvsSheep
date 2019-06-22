@@ -5,10 +5,9 @@ Also known as [Fox & Hounds](https://en.wikipedia.org/wiki/Fox_games#Fox_and_Hou
 
 Played on 10 x 10 checkerboard, as in [International draughts](https://en.wikipedia.org/wiki/International_draughts).
 
-# Game algorithm
+Algorithm : [Negamax with alpha beta pruning and transposition tables](https://en.wikipedia.org/wiki/Negamax#Negamax_with_alpha_beta_pruning_and_transposition_tables)
 
-Use negamax algorithm, see [An Introduction to Game Tree Algorithms](http://www.hamedahmadi.com/gametree/).
-
+See also [An Introduction to Game Tree Algorithms](http://www.hamedahmadi.com/gametree/).
 
 # Angular
 
