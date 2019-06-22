@@ -1,4 +1,6 @@
-import { GameState, MIN_SCORE, MAX_SCORE } from './GameState';
+import { GameNode } from './GameNode';
+import { MIN_SCORE, MAX_SCORE } from './GameBase';
+import { GameState, IGameState } from './GameState';
 
 //References: 
 // Negamax with alpha beta pruning and transposition tables : https://en.wikipedia.org/wiki/Negamax#Negamax_with_alpha_beta_pruning_and_transposition_tables
@@ -31,9 +33,8 @@ class Transposition {
 export class Solver {
     private maxDepth: number;
     private mapTranspositions: Map<number, Transposition>[];
-    private bestGame: GameState;
+    private bestGame: GameNode;
 
-    public score: number;
     public elapsed: number;
     public nbIterations: number;
     public nbPlay: number;
@@ -49,7 +50,7 @@ export class Solver {
             this.mapTranspositions[i] = new Map<number, Transposition>();
     }
 
-    public play(gsParent: GameState, maxDepth: number): GameState {
+    public play(gsParent: IGameState, maxDepth: number): GameState {
         this.maxDepth = maxDepth - 1;
         this.nbFound = this.nbPlay = this.nbIterations = 0;
         let start = performance.now();
@@ -57,20 +58,20 @@ export class Solver {
         this.reset();
         this.bestGame = null;
 
-        this.negaMax(gsParent, 0, MIN_SCORE, MAX_SCORE);
+        let score = this.negaMax(GameNode.fromIGameState(gsParent), 0, MIN_SCORE, MAX_SCORE);
 
-        let gs: GameState = this.bestGame;
+        let gs: GameNode = this.bestGame;
+        score = gs.makeTrueScore(score);
 
-        this.score = gs.trueScore;
         this.elapsed = Math.round(performance.now() - start);
-        this.statusString = `${gs.nbMoves.toString().padStart(2)}: ${gs.getPlayerId(true)} score:${gs.trueScore.toString().padStart(5)} wolf:${gs.wolf} sheep:${gs.sheep} nb:${this.nbIterations} nbPlay:${this.nbPlay} nbFound:${this.nbFound} time:${this.elapsed}`;
+        this.statusString = `${gs.nbMoves.toString().padStart(2)}: ${gs.playerId} score:${score.toString().padStart(5)} wolf:${gs.wolf} sheep:${gs.sheep} nb:${this.nbIterations} nbPlay:${this.nbPlay} nbFound:${this.nbFound} time:${this.elapsed}`;
 
         console.log(this.statusString, gs);
-        return gs;
+        return GameState.fromGameBase(gs);
     }
 
 
-    private negaMax(gsParent: GameState, depth: number, alpha: number, beta: number): number {
+    private negaMax(gsParent: GameNode, depth: number, alpha: number, beta: number): number {
         ++this.nbIterations;
 
         let alphaOrig = alpha;
@@ -105,16 +106,16 @@ export class Solver {
         let states = gsParent.play();
 
         if (states.length === 0) {
-            //let score = -MAX_SCORE + gsParent.nbMoves;
-            let score = -MAX_SCORE + depth;
+            let score = -MAX_SCORE + gsParent.nbMoves;
+            //let score = -MAX_SCORE + depth;
             //this.mapTranspositions[lookupIndex].set(lookupHash, new Transposition(score, TranspositionFlag.Exact));
             return score;
         }
 
         let wolfTurn = gsParent.isWolf;	// true if wolf plays this turn
 
-        //let adjustScore = gsParent.nbMoves+1;
-        let adjustScore = depth + 1;
+        let adjustScore = gsParent.nbMoves + 1;
+        //let adjustScore = depth + 1;
 
         for (let gsChild of states) {
             let x = 0;
@@ -134,8 +135,7 @@ export class Solver {
             gsChild.score = x;
 
             if (x >= 800) {
-                if (depth === 0){
-                    gsChild.score = x;
+                if (depth === 0) {
                     this.bestGame = gsChild;
                 }
 
@@ -149,7 +149,7 @@ export class Solver {
         for (let gsChild of states) {
             let x = gsChild.score;
 
-            if (x !== 0) {
+            if (x) {
                 // Use x from previous step
             }
             else if (depth === this.maxDepth) {
@@ -159,12 +159,10 @@ export class Solver {
                 x = -this.negaMax(gsChild, depth + 1, -beta, -alpha);
             }
 
-            gsChild.score = x;
-
             if (x > value) {
                 value = x;
 
-                if (depth === 0){
+                if (depth === 0) {
                     this.bestGame = gsChild;
                 }
 

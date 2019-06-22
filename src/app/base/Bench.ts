@@ -1,6 +1,6 @@
 import { Solver } from './Solver';
-import { GameState, GameStatus } from './GameState';
 import { detect } from 'detect-browser';
+import { GameState, GameStatus } from './GameState';
 
 export class Bench {
     static run(win: Window, settings: { wolfDepth: number, sheepDepth: number }): void {
@@ -36,7 +36,7 @@ export class Bench {
 
         solver.reset();
 
-        res += `Done in ${tsTotal} ms - Max=${tsMax} ms - nbTotal=${nbTotal} - nbPlay=${nbPlay} - nbFound=${nbFound} - Result:${solver.score} ${GameStatus[gs.status]} ${gs.status === GameStatus.SheepWon ? 'OK' : 'FAIL'}`;
+        res += `Done in ${tsTotal} ms - Max=${tsMax} ms - nbTotal=${nbTotal} - nbPlay=${nbPlay} - nbFound=${nbFound} - ${GameStatus[gs.status]} ${gs.status === GameStatus.SheepWon ? 'OK' : 'FAIL'}`;
 
         if (!win)
             win = window.open('', 'Benchmark');

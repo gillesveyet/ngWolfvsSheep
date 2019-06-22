@@ -3,13 +3,13 @@ import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { Observable, Observer, of } from "rxjs";
 
-import { GameState, GameStatus, IGameState } from './base/GameState';
 import { Model, PlayerMode } from './base/Model';
 import { CheckerPanel } from './base/CheckerPanel';
 import { Bench } from './base/Bench';
 import { Pos } from './base/Pos';
 import { NewGameComponent } from './views/new-game/new-game.component';
 import { EndGameComponent, EndGameDialogData } from './views/end-game/end-game.component';
+import { GameState, GameStatus } from './base/GameState';
 
 
 const DEFAULT_DEPTH = 17;
@@ -38,7 +38,7 @@ export class AppComponent {
 
     readonly workerSolver = new Worker('./base/Solver.worker', { type: 'module' });
     checker: CheckerPanel;
-    gameHistory: IGameState[] = [];
+    gameHistory: GameState[] = [];
     busy = false;
 
     get showMenuGame() {
@@ -113,7 +113,7 @@ export class AppComponent {
     }
 
 
-    onCpuPlay(gs: IGameState) {
+    onCpuPlay(gs: GameState) {
         this.addGS(gs);
 
         if (this.isAutoplayOn && (gs.isGameOver || this.isAutoplayPausing)) {
@@ -197,7 +197,7 @@ export class AppComponent {
         return this.playerMode === PlayerMode.TwoPlayers;
     }
 
-    getGS(): IGameState {
+    getGS(): GameState {
         return this.gameHistory.length > 0 ? this.gameHistory[this.gameHistory.length - 1] : null;
     }
 
@@ -206,7 +206,7 @@ export class AppComponent {
         return gs && gs.isGameOver;
     }
 
-    addGS(gs: IGameState) {
+    addGS(gs: GameState) {
         this.gameHistory.push(gs);
     }
 
@@ -372,7 +372,7 @@ export class AppComponent {
         }
     }
 
-    showVictory(gs: IGameState): void {
+    showVictory(gs: GameState): void {
         let msg: string;
 
         if (this.isTwoPlayerMode) {

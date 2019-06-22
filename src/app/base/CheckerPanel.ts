@@ -1,6 +1,6 @@
-﻿import { IGameState } from './GameState';
-import { Pos } from './Pos';
+﻿import { Pos } from './Pos';
 import { Observable } from 'rxjs';
+import { GameState } from './GameState';
 
 enum Color {
     Black,
@@ -18,7 +18,7 @@ export class CheckerPanel {
     public onGetValidMoves: (selected: Pos) => Pos[];
     public onMovePiece: (oldPos: Pos, newPos: Pos) => void;
 
-    private gameState: IGameState;
+    private gameState: GameState;
     private isPlayEnabled: boolean;
     private selectedPiece: Pos = null;
     private validMoves: Pos[] = null;
@@ -71,7 +71,7 @@ export class CheckerPanel {
         });
     }
 
-    setPositions(gs: IGameState, enablePlay: boolean): void {
+    setPositions(gs: GameState, enablePlay: boolean): void {
         this.selectedPiece = null;
         this.validMoves = null;
 
