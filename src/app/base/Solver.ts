@@ -158,10 +158,6 @@ export class Solver {
                 x = -this.negaMax(gsChild, depth + 1, -beta, -alpha);
             }
 
-            if (depth === 0 && wolfTurn)
-                console.log(`wolf:${gsChild.wolf} score:${x}`);
-
-
             if (x > value) {
                 value = x;
 
