@@ -23,7 +23,7 @@ export class GameState extends GameBase implements IGameState {
         } else if (gs.isWolf && gs.getValidWolfMoves().length === 0) {
             return GameStatus.SheepWon;
         } else if (!gs.isWolf && !gs.sheepCanPlay()) {  // should never happen unless wolf & sheep really want that happen
-            return GameStatus.WolfWon;  
+            return GameStatus.WolfWon;
         }
         else {
             return GameStatus.NotFinished;
@@ -128,12 +128,12 @@ export class GameState extends GameBase implements IGameState {
     }
 
 
-    private sheepCanPlay() {
+    private sheepCanPlay(): boolean {
         for (let s of this.sheep)
             if (this.getValidSheepMoves(s).length > 0)
                 return true;
 
-       return false;
+        return false;
     }
 
 }
