@@ -17,11 +17,13 @@ export interface IGameState {
 export class GameState extends GameBase implements IGameState {
     public status: GameStatus;
 
-    static computeStatus(gs) : GameStatus{
+    static computeStatus(gs): GameStatus {
         if (gs.wolfHasWon) {
-            return  GameStatus.WolfWon;
-        } else if (gs.isWolf &&  gs.getValidWolfMoves().length === 0) {
+            return GameStatus.WolfWon;
+        } else if (gs.isWolf && gs.getValidWolfMoves().length === 0) {
             return GameStatus.SheepWon;
+        } else if (!gs.isWolf && !gs.sheepCanPlay()) {  // should never happen unless wolf & sheep really want that happen
+            return GameStatus.WolfWon;  
         }
         else {
             return GameStatus.NotFinished;
@@ -45,7 +47,7 @@ export class GameState extends GameBase implements IGameState {
     }
 
     public makePlayerMove(oldp: Pos, newp: Pos): GameState {
-        let gs = this.isWolf ?  this.makeNewGameStateWolf(newp) : this.makeNewGameStateSheep(oldp, newp);
+        let gs = this.isWolf ? this.makeNewGameStateWolf(newp) : this.makeNewGameStateSheep(oldp, newp);
         gs.status = GameState.computeStatus(gs);
 
         console.log(`${gs.nbMoves.toString().padStart(2)}: ${gs.playerId} status:${GameStatus[gs.status].padEnd(10)} Wolf:${gs.wolf} Sheep:${gs.sheep}`);
@@ -123,6 +125,15 @@ export class GameState extends GameBase implements IGameState {
         }
 
         return list;
+    }
+
+
+    private sheepCanPlay() {
+        for (let s of this.sheep)
+            if (this.getValidSheepMoves(s).length > 0)
+                return true;
+
+       return false;
     }
 
 }

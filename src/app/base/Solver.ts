@@ -107,6 +107,7 @@ export class Solver {
 
         if (states.length === 0) {
             let score = -MAX_SCORE + depth;
+            //not stored in wikipedia algo so I am not sure if it would be OK. Unnoticeable effect on performance anyway.
             //this.mapTranspositions[lookupIndex].set(lookupHash, new Transposition(score, TranspositionFlag.Exact));
             return score;
         }
@@ -117,7 +118,7 @@ export class Solver {
         for (let gsChild of states) {
             let x = 0;
 
-            if (gsChild.wolfHasWon) {                   // wolf play and win
+            if (gsChild.wolfHasWon) {                       // wolf play and win
                 x = MAX_SCORE - adjustScore;
             } else if (gsChild.isSheepBest) {	            // sheep : perfect move
                 x = -800 - adjustScore;
@@ -136,6 +137,7 @@ export class Solver {
                     this.bestGame = gsChild;
                 }
 
+                //not sure if it would be OK. Unnoticeable effect on performance anyway.
                 //this.mapTranspositions[lookupIndex].set(lookupHash, new Transposition(x, TranspositionFlag.Exact));
                 return x;
             }
