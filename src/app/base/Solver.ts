@@ -121,7 +121,7 @@ export class Solver {
             if (gsChild.wolfHasWon) {                       // wolf play and win
                 x = MAX_SCORE - adjustScore;
             } else if (gsChild.isSheepBest) {	            // sheep : perfect move
-                x = -800 - adjustScore;
+                x = -900 + adjustScore;
             } else if (gsChild.wolfWillWin) {
                 x = MAX_SCORE - adjustScore - gsChild.deltaWolfToLowestSheep * 2;
             }
@@ -157,6 +157,10 @@ export class Solver {
             else {
                 x = -this.negaMax(gsChild, depth + 1, -beta, -alpha);
             }
+
+            if (depth === 0 && wolfTurn)
+                console.log(`wolf:${gsChild.wolf} score:${x}`);
+
 
             if (x > value) {
                 value = x;
