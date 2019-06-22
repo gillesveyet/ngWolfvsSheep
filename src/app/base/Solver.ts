@@ -106,16 +106,13 @@ export class Solver {
         let states = gsParent.play();
 
         if (states.length === 0) {
-            let score = -MAX_SCORE + gsParent.nbMoves;
-            //let score = -MAX_SCORE + depth;
+            let score = -MAX_SCORE + depth;
             //this.mapTranspositions[lookupIndex].set(lookupHash, new Transposition(score, TranspositionFlag.Exact));
             return score;
         }
 
         let wolfTurn = gsParent.isWolf;	// true if wolf plays this turn
-
-        let adjustScore = gsParent.nbMoves + 1;
-        //let adjustScore = depth + 1;
+        let adjustScore = depth + 1;
 
         for (let gsChild of states) {
             let x = 0;
