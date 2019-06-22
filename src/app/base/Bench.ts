@@ -31,7 +31,7 @@ export class Bench {
             if (solver.elapsed > tsMax)
                 tsMax = solver.elapsed;
 
-            res += solver.statusString + '<br>';
+            res += solver.statusString.replace(new RegExp(' ', 'g'), '&nbsp;') + '<br>';
         }
 
         solver.reset();

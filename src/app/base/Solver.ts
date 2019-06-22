@@ -64,7 +64,7 @@ export class Solver {
         score = gs.makeTrueScore(score);
 
         this.elapsed = Math.round(performance.now() - start);
-        this.statusString = `${gs.nbMoves.toString().padStart(2)}: ${gs.playerId} score:${score.toString().padStart(5)} wolf:${gs.wolf} sheep:${gs.sheep} nb:${this.nbIterations} nbPlay:${this.nbPlay} nbFound:${this.nbFound} time:${this.elapsed}`;
+        this.statusString = `${gs.nbMoves.toString().padStart(2)}: ${gs.playerId} score:${score.toString().padStart(5)} wolf:${gs.wolf} sheep:${gs.sheep} nb:${this.nbIterations.toString().padStart(6)} nbPlay:${this.nbPlay.toString().padStart(6)} nbFound:${this.nbFound.toString().padStart(6)} time:${this.elapsed.toString().padStart(4)}`;
 
         console.log(this.statusString, gs);
         return GameState.fromGameBase(gs);
