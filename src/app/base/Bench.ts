@@ -34,8 +34,6 @@ export class Bench {
             res += solver.statusString.replace(new RegExp(' ', 'g'), '&nbsp;') + '<br>';
         }
 
-        solver.reset();
-
         res += `Done in ${tsTotal} ms - Max=${tsMax} ms - nbTotal=${nbTotal} - nbPlay=${nbPlay} - nbFound=${nbFound} - ${GameStatus[gs.status]} ${gs.status === GameStatus.SheepWon ? 'OK' : 'FAIL'}`;
 
         if (!win)

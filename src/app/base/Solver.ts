@@ -41,9 +41,7 @@ export class Solver {
     public nbFound: number;
     public statusString: string;
 
-    static instance: Solver = new Solver();
-
-    public reset() {
+    private initMapTranspositions() {
         this.mapTranspositions = [];
 
         for (let i = 0; i < 50; ++i)
@@ -55,7 +53,7 @@ export class Solver {
         this.nbFound = this.nbPlay = this.nbIterations = 0;
         let start = performance.now();
 
-        this.reset();
+        this.initMapTranspositions();
         this.bestGame = null;
 
         let score = this.negaMax(GameNode.fromIGameState(gsParent), 0, MIN_SCORE, MAX_SCORE);
@@ -65,6 +63,8 @@ export class Solver {
 
         this.elapsed = Math.round(performance.now() - start);
         this.statusString = `${gs.nbMoves.toString().padStart(2)}: ${gs.playerId} score:${score.toString().padStart(5)} wolf:${gs.wolf} sheep:${gs.sheep} nb:${this.nbIterations.toString().padStart(6)} nbPlay:${this.nbPlay.toString().padStart(6)} nbFound:${this.nbFound.toString().padStart(6)} time:${this.elapsed.toString().padStart(4)}`;
+
+        this.mapTranspositions = null;  // free memory
 
         console.log(this.statusString, gs);
         return GameState.fromGameBase(gs);
