@@ -5,7 +5,9 @@ Also known as [Fox & Hounds](https://en.wikipedia.org/wiki/Fox_games#Fox_and_Hou
 
 Played on 10 x 10 checkerboard, as in [International draughts](https://en.wikipedia.org/wiki/International_draughts).
 
-Algorithm : [Negamax with alpha beta pruning and transposition tables](https://en.wikipedia.org/wiki/Negamax#Negamax_with_alpha_beta_pruning_and_transposition_tables)
+# Algorithm
+
+I used this: [Negamax with alpha beta pruning and transposition tables](https://en.wikipedia.org/wiki/Negamax#Negamax_with_alpha_beta_pruning_and_transposition_tables)
 
 See also [An Introduction to Game Tree Algorithms](http://www.hamedahmadi.com/gametree/).
 
@@ -28,5 +30,9 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app w
 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
 
+
+# Credits
+
+Main icon from SVG Repo: https://www.svgrepo.com/svg/24608/sheep
 
 
