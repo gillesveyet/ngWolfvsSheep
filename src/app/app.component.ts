@@ -11,8 +11,6 @@ import { EndGameComponent, EndGameDialogData } from './views/end-game/end-game.c
 import { GameState, GameStatus } from './base/GameState';
 
 
-const DEFAULT_DEPTH = 17;
-
 enum Autoplay {
     Off,
     Run,
@@ -28,12 +26,12 @@ enum Autoplay {
 export class AppComponent {
     status: string;
     playerMode: PlayerMode = PlayerMode.None;
-
+    cpuLevel = 2;    // 0=Low, 1=Medium, 2=High
     isExpertMode = false;
     showSpinner = false;
     autoplay: Autoplay = Autoplay.Off;
     autoplayDelay = 150;    // delay in ms.
-    settings = { wolfDepth: DEFAULT_DEPTH, sheepDepth: DEFAULT_DEPTH };
+    settings = { wolfDepth: 0, sheepDepth: 0 };
 
     readonly workerSolver = new Worker('./base/Solver.worker', { type: 'module' });
     checker: CheckerPanel;
@@ -81,6 +79,8 @@ export class AppComponent {
     ngOnInit() {
         window['bench'] = Bench;
 
+        this.adjustCpuLevel();
+
         this.checker = new CheckerPanel(this.canvasRef.nativeElement);
 
         this.checker.onGetValidMoves = (selected: Pos) => {
@@ -106,6 +106,12 @@ export class AppComponent {
             //console.log(`workerSolver got message:`, data);
             this.onCpuPlay(GameState.clone(data));
         };
+    }
+
+    adjustCpuLevel() {
+        let depth = [6, 10, 17][this.cpuLevel];
+        this.settings.wolfDepth = this.settings.sheepDepth = depth;
+        console.log(`CPU Level:${this.cpuLevel} => ${depth}`)
     }
 
     cpuPlay() {
@@ -249,7 +255,7 @@ export class AppComponent {
     }
 
     onGameNew() {
-        let data: NewGameData = { playerMode: this.playerMode };
+        let data: NewGameData = { playerMode: this.playerMode, cpuLevel : this.cpuLevel };
         const dialogRef = this.dialog.open(NewGameComponent, { data: data, autoFocus: false, position: { top: "200px" } });
 
         dialogRef.afterClosed().subscribe(result => {
@@ -261,6 +267,8 @@ export class AppComponent {
 
             if (result) {
                 let r: NewGameResult = result;
+                this.cpuLevel = r.cpuLevel;
+                this.adjustCpuLevel();
                 this.startGame(r.playerMode, r.autoplay);
             }
         });

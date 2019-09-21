@@ -1,9 +1,16 @@
 <h2 mat-dialog-title>{{title}}</h2>
-<mat-dialog-content>Make your choice:</mat-dialog-content>
+
+<div>
+    <label>CPU Level:</label>
+    <mat-chip-list>
+        <mat-chip *ngFor="let c of cpuLevels" (click)="$event.target.blur();cpuLevel=c.value;" [selected]="cpuLevel===c.value" color="accent">{{c.text}}</mat-chip>
+    </mat-chip-list>
+</div>
+
 <mat-dialog-actions>
-    <button mat-raised-button (click)="onPlayerMode(PlayerMode.Wolf)">Play Wolf</button>
+    <button mat-raised-button (click)="onPlayerMode(PlayerMode.PlayWolf)">Play Wolf</button>
     <button mat-raised-button (click)="onPlayerMode(PlayerMode.PlaySheep)">Play Sheep</button>
     <button mat-raised-button (click)="onPlayerMode(PlayerMode.TwoPlayers)">2 Players</button>
     <button mat-raised-button (click)="onPlayAuto()">Auto Play</button>
-    <button mat-raised-button (click)="onCancel()">Cancel</button>
+    <!-- <button mat-raised-button (click)="onCancel()">Cancel</button> -->
 </mat-dialog-actions>
