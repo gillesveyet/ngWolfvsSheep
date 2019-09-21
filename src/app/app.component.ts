@@ -1,13 +1,12 @@
 import { Component, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { Observable, Observer, of } from "rxjs";
 
-import { Model, PlayerMode } from './base/Model';
+import { PlayerMode } from './base/Model';
 import { CheckerPanel } from './base/CheckerPanel';
 import { Bench } from './base/Bench';
 import { Pos } from './base/Pos';
-import { NewGameComponent } from './views/new-game/new-game.component';
+import { NewGameComponent, NewGameData, NewGameResult } from './views/new-game/new-game.component';
 import { EndGameComponent, EndGameDialogData } from './views/end-game/end-game.component';
 import { GameState, GameStatus } from './base/GameState';
 
@@ -28,9 +27,9 @@ enum Autoplay {
 })
 export class AppComponent {
     status: string;
+    playerMode: PlayerMode = PlayerMode.None;
 
     isExpertMode = false;
-    showMenuPlay = true;
     showSpinner = false;
     autoplay: Autoplay = Autoplay.Off;
     autoplayDelay = 150;    // delay in ms.
@@ -41,8 +40,12 @@ export class AppComponent {
     gameHistory: GameState[] = [];
     busy = false;
 
+    get inGame() {
+        return this.playerMode !== PlayerMode.None;
+    }
+
     get showMenuGame() {
-        return !this.showMenuPlay && (this.autoplay === Autoplay.Off || this.autoplay === Autoplay.Paused);
+        return this.autoplay === Autoplay.Off || this.autoplay === Autoplay.Paused;
     }
 
     get isGameBackEnabled() {
@@ -185,14 +188,6 @@ export class AppComponent {
         }
     }
 
-    get playerMode(): PlayerMode {
-        return Model.playerMode;
-    }
-
-    set playerMode(value: PlayerMode) {
-        Model.playerMode = value;
-    }
-
     get isTwoPlayerMode(): boolean {
         return this.playerMode === PlayerMode.TwoPlayers;
     }
@@ -214,7 +209,7 @@ export class AppComponent {
         console.log('resetGame');
         this.gameHistory = [];
         this.checker.setPositions(null, false);
-        this.showMenuPlay = true;
+        this.playerMode = PlayerMode.None;
         this.autoplay = Autoplay.Off;
 
         this.displayInfo();
@@ -222,18 +217,6 @@ export class AppComponent {
 
     displayStatus(msg: string) {
         this.status = msg;
-    }
-
-    onPlaySheep() {
-        this.startGame(PlayerMode.PlaySheep);
-    }
-
-    onPlayWolf() {
-        this.startGame(PlayerMode.PlayWolf);
-    }
-
-    onPlayTwoPlayers() {
-        this.startGame(PlayerMode.TwoPlayers);
     }
 
     onPlayAuto() {
@@ -266,25 +249,22 @@ export class AppComponent {
     }
 
     onGameNew() {
-        (this.isGameOver ? of(true) : this.confirmNewGame()).subscribe(result => {
-            if (result)
-                this.resetGame();
+        let data: NewGameData = { playerMode: this.playerMode };
+        const dialogRef = this.dialog.open(NewGameComponent, { data: data, autoFocus: false, position: { top: "200px" } });
+
+        dialogRef.afterClosed().subscribe(result => {
+            console.log(`NewGame dialog result:`, result);
+
+            //set focus on canvas to remove focus from "New Game" button (would appear greyed otherwise).
+            //note that canvas is not focusable by default, I needed to add "tabindex=0"
+            this.canvasRef.nativeElement.focus();
+
+            if (result) {
+                let r: NewGameResult = result;
+                this.startGame(r.playerMode, r.autoplay);
+            }
         });
     }
-
-    confirmNewGame(): Observable<boolean> {
-        return Observable.create((observer: Observer<boolean>) => {
-
-            const dialogRef = this.dialog.open(NewGameComponent, { position: { top: "200px" } });
-
-            dialogRef.afterClosed().subscribe(result => {
-                console.log(`NewGame dialog result:${result}`);
-                observer.next(result);
-                observer.complete();
-            });
-        });
-    }
-
 
     onBenchmark() {
         //from http://en.nisi.ro/blog/development/javascript/open-new-window-window-open-seen-chrome-popup/
@@ -320,10 +300,9 @@ export class AppComponent {
             this.gameHistory = JSON.parse(<string>reader.result).map(gs => GameState.clone(gs));
             let gs = this.getGS();
 
-            if (this.showMenuPlay) {
-                this.showMenuPlay = false;
+            if (this.playerMode === PlayerMode.None) {
                 this.playerMode = PlayerMode.TwoPlayers;
-                this.autoplay = Autoplay.Paused;
+                //this.autoplay = Autoplay.Paused;
             } else if (this.playerMode === PlayerMode.PlayWolf && !gs.isWolf || this.playerMode === PlayerMode.PlaySheep && gs.isWolf) {
                 // Current player mode does not match save game so remove last move.
                 this.gameHistory.pop();
@@ -340,7 +319,6 @@ export class AppComponent {
 
     startGame(mode: PlayerMode, autoplay = false): void {
         this.playerMode = mode;
-        this.showMenuPlay = false;
 
         let gs = GameState.getInitialGameState()
         this.addGS(gs);
@@ -359,7 +337,7 @@ export class AppComponent {
         let gs = this.getGS();
 
         if (gs == null)
-            this.displayStatus('Select mode');
+            this.displayStatus('Start a new game');
         else if (gs.isGameOver)
             this.showVictory(gs);
         else if (this.isAutoplayRun)
@@ -392,7 +370,7 @@ export class AppComponent {
         let dialogData: EndGameDialogData = { message: msg };
 
         setTimeout(() =>
-            this.dialog.open(EndGameComponent, { data: dialogData, position: { top: "200px" } }),
+            this.dialog.open(EndGameComponent, { data: dialogData, autoFocus: false, position: { top: "200px" } }),
             150);
     }
 

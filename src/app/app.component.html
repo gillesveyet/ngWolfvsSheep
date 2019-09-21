@@ -12,20 +12,11 @@
         <div class="content">
             <a #fileSaver style="display:none"></a>
             <input #fileLoader type="file" accept=".json" style="display:none" (change)="onFileLoader($event)" />
-
             <div class="menu">
-                <div *ngIf="showMenuPlay">
-                    <button mat-raised-button (click)="onPlaySheep()">Play Sheep vs CPU</button>
-                    <button mat-raised-button (click)="onPlayWolf()">Play Wolf vs CPU</button>
-                    <button mat-raised-button (click)="onPlayTwoPlayers()">2 Players</button>
-                    <button mat-raised-button (click)="onPlayAuto()">Auto Play</button>
-                </div>
-
+                <button mat-raised-button *ngIf="showMenuGame" (click)="onGameNew()">New Game</button>
+                <button mat-raised-button *ngIf="showMenuGame && inGame" [disabled]="!isGameBackEnabled" (click)="onGameBack()">Move Back</button>
                 <button mat-raised-button *ngIf="isAutoplayRun" [disabled]="isGameOver" (click)="onAutoplayPause()">Pause Auto Play</button>
                 <button mat-raised-button *ngIf="isAutoplayOn && !isAutoplayRun" [disabled]="isGameOver || isAutoplayPausing" (click)="onAutoplayResume()">Resume Auto Play</button>
-
-                <button mat-raised-button *ngIf="showMenuGame" [disabled]="!isGameBackEnabled" (click)="onGameBack()">Move Back</button>
-                <button mat-raised-button *ngIf="showMenuGame" (click)="onGameNew()">New Game</button>
             </div>
 
             <div *ngIf="isExpertMode" class="settings">
@@ -46,7 +37,7 @@
 
             <div class="board">
                 <mat-spinner *ngIf="showSpinner" [diameter]="200" [color]="'accent'" class="spinner"></mat-spinner>
-                <canvas #canBoard class="can-board" width="600" height="600"></canvas>
+                <canvas #canBoard tabindex=0 class="can-board" width="600" height="600"></canvas>
             </div>
 
             <div class="status">

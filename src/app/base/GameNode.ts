@@ -1,4 +1,3 @@
-import { Model, PlayerMode } from './Model';
 import { Pos } from './Pos';
 import { GameBase, NB_SHEEP } from './GameBase';
 import { IGameState } from './GameState';
@@ -526,17 +525,13 @@ export class GameNode extends GameBase {
     }
 
     private makeNewGameStateWolf(wolf: Pos): GameNode {
-        return new GameNode (this.nbMoves + 1, wolf, this.sheep);
+        return new GameNode(this.nbMoves + 1, wolf, this.sheep);
     }
 
     private makeNewGameStateSheep(olds: Pos, news: Pos): GameNode {
-        let gn = new GameNode (this.nbMoves + 1, this.wolf, this.sheep);
+        let gn = new GameNode(this.nbMoves + 1, this.wolf, this.sheep);
         gn.moveSheep(olds, news);
         return gn;
-    }
-
-    get playerNumber() {
-        return Model.playerMode === PlayerMode.TwoPlayers ? 'P' + (this.nbMoves % 2 ? 1 : 2) : 'P';
     }
 
     public get isSheepBest(): boolean {
