@@ -1,6 +1,6 @@
 <h2 mat-dialog-title>{{title}}</h2>
 
-<div>
+<div class="chip-list-item">
     <label>CPU Level:</label>
     <mat-chip-list>
         <mat-chip *ngFor="let c of cpuLevels" (click)="$event.target.blur();cpuLevel=c.value;" [selected]="cpuLevel===c.value" color="accent">{{c.text}}</mat-chip>
