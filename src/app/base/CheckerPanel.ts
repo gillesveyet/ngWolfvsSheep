@@ -37,12 +37,8 @@ export class CheckerPanel {
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
 
-        this.canvas.onclick = (ev: MouseEvent) => {
-            //cf. http://miloq.blogspot.co.uk/2011/05/coordinates-mouse-click-canvas.html
-            let ref: HTMLElement = <HTMLElement>canvas.offsetParent;   // use parent since element position is now relative. When canvas position was static (default), I used "ref = canvas;"
-            //console.log(`canvas_onclick  x=${ev.x} y=${ev.y} clientX=${ev.clientX} clientY=${ev.clientY} pageXOffset=${window.pageXOffset} pageYOffset=${window.pageYOffset} scrollLeft=${ref.scrollLeft} scrollTop=${ref.scrollTop} offsetLeft=${ref.offsetLeft} offsetTop=${ref.offsetTop}`);
-            this.canvas_MouseClick((ev.clientX - ref.offsetLeft + window.pageXOffset) / this.XMAG | 0, (ev.clientY - ref.offsetTop + window.pageYOffset) / this.YMAG | 0);
-        };
+        this.canvas.onmousedown = (ev: MouseEvent) => { this.onMouseUpDown(ev, false) };
+        this.canvas.onmouseup = (ev: MouseEvent) => { this.onMouseUpDown(ev, true) };
 
         if (!this.canvas.getContext)
             throw 'Browser does not support Canvas';
@@ -153,13 +149,7 @@ export class CheckerPanel {
             return;
 
         if (selected !== null && this.selectedPiece !== null && selected.equals(this.selectedPiece)) {
-            //click on selected piece
-            //  -wolf : do nothing
-            //  -sheep : unselect
-            if (this.gameState.isWolf)
-                return;
-
-            this.selectedPiece = null;
+            //click on selected piece : do nothing
         }
         else
             this.selectedPiece = selected;
@@ -198,7 +188,16 @@ export class CheckerPanel {
         return false;
     }
 
-    private canvas_MouseClick(x: number, y: number) {
+    private onMouseUpDown(ev: MouseEvent, up: boolean) {
+        //cf. http://miloq.blogspot.co.uk/2011/05/coordinates-mouse-click-canvas.html
+        let ref: HTMLElement = <HTMLElement>this.canvas.offsetParent;   // use parent since element position is now relative. When canvas position was static (default), I used "ref = canvas;"
+        console.log(`onmouse${up ? 'up' : 'down'}  x=${ev.x} y=${ev.y} clientX=${ev.clientX} clientY=${ev.clientY} pageXOffset=${window.pageXOffset} pageYOffset=${window.pageYOffset} scrollLeft=${ref.scrollLeft} scrollTop=${ref.scrollTop} offsetLeft=${ref.offsetLeft} offsetTop=${ref.offsetTop}`);
+        
+        //mpuse up and down are all treated as mouse click : allow drag & drop.
+        this.onMouseClick((ev.clientX - ref.offsetLeft + window.pageXOffset) / this.XMAG | 0, (ev.clientY - ref.offsetTop + window.pageYOffset) / this.YMAG | 0);
+    };
+
+    private onMouseClick(x: number, y: number) {
         if (!this.isPlayEnabled)
             return;
 
@@ -207,7 +206,7 @@ export class CheckerPanel {
 
         let p = Pos.getPos(x, y);
 
-        //console.log(`canvas_MouseClick - x=${x} y=${y} p=${p} selected=${this.selectedPiece}`);
+        console.log(`canvas_MouseClick - x=${x} y=${y} p=${p} selected=${this.selectedPiece}`);
 
         if (!this.gameState.isWolf && this.isSheep(p))
             this.updateSelected(p, true);
