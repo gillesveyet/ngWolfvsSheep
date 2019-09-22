@@ -22,7 +22,7 @@ export class GameState extends GameBase implements IGameState {
             return GameStatus.WolfWon;
         } else if (gs.isWolf && gs.getValidWolfMoves().length === 0) {
             return GameStatus.SheepWon;
-        } else if (!gs.isWolf && !gs.sheepCanPlay()) {  // should never happen unless wolf & sheep really want that happen
+        } else if (!gs.isWolf && !gs.sheepCanPlay()) {  // can happen if wolf & sheep play strangely (not trying to win)
             return GameStatus.WolfWon;
         }
         else {

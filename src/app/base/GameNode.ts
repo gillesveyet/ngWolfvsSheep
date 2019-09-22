@@ -552,7 +552,7 @@ export class GameNode extends GameBase {
     public get wolfWillWin(): boolean {
         let wy = this.wolf.y;
 
-        if (this.sheep[0].y - wy > 4)	// if lowest sheep is more than 4 row below wolf : skip test
+        if (this.sheep[0].y - wy > 4)	// if lowest sheep is more than 4 rows below wolf : skip test
             return false;
 
         let wx = this.wolf.x;
