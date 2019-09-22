@@ -5,6 +5,11 @@ Also known as [Fox & Hounds](https://en.wikipedia.org/wiki/Fox_games#Fox_and_Hou
 
 Played on 10 x 10 checkerboard, as in [International draughts](https://en.wikipedia.org/wiki/International_draughts).
 
+# Run the app on my web site
+
+https://gillesveyet.yo.fr/sheep/
+
+
 # Algorithm
 
 I used this: [Negamax with alpha beta pruning and transposition tables](https://en.wikipedia.org/wiki/Negamax#Negamax_with_alpha_beta_pruning_and_transposition_tables)
@@ -26,9 +31,15 @@ Web worker for Solver:  `ng generate web-worker base/Solver`
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
 
-## Build
+## Build for deployment
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+To deploy on `/sheep` path, command is: `ng build --prod --base-href /sheep/`
+
+See also src/manifest.webmanifest (PWA support) :
+```json  
+"scope": "/sheep/",
+"start_url": "/sheep/",
+```
 
 
 # Credits
