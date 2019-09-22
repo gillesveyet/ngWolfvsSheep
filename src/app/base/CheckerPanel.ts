@@ -46,6 +46,8 @@ export class CheckerPanel {
         this.ctx = this.canvas.getContext('2d');
         this.XMAG = this.canvas.width / 10;
         this.YMAG = this.canvas.height / 10;
+
+        console.log(`Canvas width:${this.canvas.width} height:${this.canvas.height}`);
     }
 
     init() {
@@ -189,15 +191,17 @@ export class CheckerPanel {
     }
 
     private onMouseUpDown(ev: MouseEvent, up: boolean) {
-        //cf. http://miloq.blogspot.co.uk/2011/05/coordinates-mouse-click-canvas.html
-        let ref: HTMLElement = <HTMLElement>this.canvas.offsetParent;   // use parent since element position is now relative. When canvas position was static (default), I used "ref = canvas;"
-        console.log(`onmouse${up ? 'up' : 'down'}  x=${ev.x} y=${ev.y} clientX=${ev.clientX} clientY=${ev.clientY} pageXOffset=${window.pageXOffset} pageYOffset=${window.pageYOffset} scrollLeft=${ref.scrollLeft} scrollTop=${ref.scrollTop} offsetLeft=${ref.offsetLeft} offsetTop=${ref.offsetTop}`);
-        
+        const rect = this.canvas.getBoundingClientRect();
+        // console.log('getBoundingClientRect:', rect);
+        console.log(`onmouse${up ? 'up' : 'down'}  x=${ev.x} y=${ev.y} clientX=${ev.clientX} clientY=${ev.clientY} BouncingRect [top:${rect.top} left:${rect.left} width:${rect.width} height:${rect.height}]`);
+
         //mpuse up and down are all treated as mouse click : allow drag & drop.
-        this.onMouseClick((ev.clientX - ref.offsetLeft + window.pageXOffset) / this.XMAG | 0, (ev.clientY - ref.offsetTop + window.pageYOffset) / this.YMAG | 0);
+        this.onMouseClick((ev.clientX - rect.left) * 10 / rect.width | 0, (ev.clientY - rect.top) * 10 / rect.height | 0);
     };
 
     private onMouseClick(x: number, y: number) {
+        console.log(`canvas_MouseClick - x=${x} y=${y} selected=${this.selectedPiece}`);
+
         if (!this.isPlayEnabled)
             return;
 
@@ -205,8 +209,6 @@ export class CheckerPanel {
             return;
 
         let p = Pos.getPos(x, y);
-
-        console.log(`canvas_MouseClick - x=${x} y=${y} p=${p} selected=${this.selectedPiece}`);
 
         if (!this.gameState.isWolf && this.isSheep(p))
             this.updateSelected(p, true);
