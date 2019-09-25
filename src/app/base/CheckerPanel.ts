@@ -8,7 +8,6 @@ enum Color {
 }
 
 enum Bitmap {
-    Checker = 'Checker',
     Black = 'Black',
     White = 'White'
 }
@@ -30,7 +29,6 @@ export class CheckerPanel {
 
     private bitmaps = {};
 
-    private get imgChecker(): HTMLImageElement { return this.bitmaps[Bitmap.Checker] }
     private get imgWolf(): HTMLImageElement { return this.bitmaps[Bitmap.Black] }
     private get imgSheep(): HTMLImageElement { return this.bitmaps[Bitmap.White] }
 
@@ -58,13 +56,13 @@ export class CheckerPanel {
                 let img = this.bitmaps[bmp] = new Image();
 
                 img.onload = () => {
-                    if (++count === 3) {
+                    if (++count === 2) {
                         observer.next();
                         observer.complete();
                     }
                 };
 
-                img.src = `assets/bitmaps/${bmp}.png`;
+                img.src = `assets/bitmaps/${bmp}.svg`;
             }
         });
     }
@@ -99,8 +97,7 @@ export class CheckerPanel {
 
 
     private onPaint(): void {
-        this.ctx.drawImage(this.imgChecker, 0, 0, this.canvas.width, this.canvas.height);
-        //this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.drawChecker();
 
         if (!this.gameState)
             return;
@@ -133,6 +130,17 @@ export class CheckerPanel {
         if (this.validMoves !== null)
             for (let p of this.validMoves)
                 this.drawSelected(p, Color.Aqua);
+    }
+
+    private drawChecker() {
+        this.ctx.fillStyle = "rgb(250,222,93)";
+        this.ctx.fillRect(0, 0, this.XMAG * 10, this.YMAG * 10);
+
+        this.ctx.fillStyle = "rgb(150,52,19)";
+
+        for (let i = 0; i < 5; ++i)
+            for (let j = 0; j < 10; ++j)
+                this.ctx.fillRect((i * 2 + (j+1) % 2) * this.XMAG, j * this.YMAG, this.XMAG, this.YMAG);
     }
 
     private drawSquare(image: HTMLImageElement, x: number, y: number) {
