@@ -1,6 +1,6 @@
 {
   "name": "ng-wolfvs-sheep",
-  "version": "0.0.0",
+  "version": "0.5.1",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -12,15 +12,15 @@
   "private": true,
   "dependencies": {
     "@angular/animations": "~8.2.8",
-    "@angular/cdk": "~8.0.0",
+    "@angular/cdk": "~8.2.1",
     "@angular/common": "~8.2.8",
     "@angular/compiler": "~8.2.8",
     "@angular/core": "~8.2.8",
     "@angular/forms": "~8.2.8",
-    "@angular/material": "^8.0.0",
+    "@angular/material": "^8.2.1",
     "@angular/platform-browser": "~8.2.8",
     "@angular/platform-browser-dynamic": "~8.2.8",
-    "@angular/pwa": "^0.800.1",
+    "@angular/pwa": "^0.803.6",
     "@angular/router": "~8.2.8",
     "@angular/service-worker": "~8.2.8",
     "detect-browser": "^4.5.0",
