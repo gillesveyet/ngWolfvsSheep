@@ -106,6 +106,9 @@ export class AppComponent {
             //console.log(`workerSolver got message:`, data);
             this.onCpuPlay(GameState.clone(data));
         };
+
+        //already not visible (behind main view).
+        (document.querySelector('.loader') as HTMLElement).style.display = 'none';
     }
 
     adjustCpuLevel() {
@@ -255,7 +258,7 @@ export class AppComponent {
     }
 
     onGameNew() {
-        let data: NewGameData = { playerMode: this.playerMode, cpuLevel : this.cpuLevel };
+        let data: NewGameData = { playerMode: this.playerMode, cpuLevel: this.cpuLevel };
         const dialogRef = this.dialog.open(NewGameComponent, { data: data, autoFocus: false, position: { top: "200px" } });
 
         dialogRef.afterClosed().subscribe(result => {
