@@ -331,6 +331,8 @@ export class AppComponent {
     startGame(mode: PlayerMode, autoplay = false): void {
         this.playerMode = mode;
 
+        this.gameHistory = [];
+
         let gs = GameState.getInitialGameState()
         this.addGS(gs);
 
@@ -339,8 +341,12 @@ export class AppComponent {
 
         if (autoplay) {
             this.makeAutoplay();
-        } else if (this.playerMode === PlayerMode.PlaySheep) {
-            this.makeCpuPlay();
+        } else {
+            this.autoplay = Autoplay.Off;
+
+            if (this.playerMode === PlayerMode.PlaySheep) {
+                this.makeCpuPlay();
+            }
         }
     }
 
@@ -348,7 +354,7 @@ export class AppComponent {
         let gs = this.getGS();
 
         if (gs == null)
-            this.displayStatus('Start a new game');
+            this.displayStatus('Click on New Game button to start');
         else if (gs.isGameOver)
             this.showVictory(gs);
         else if (this.isAutoplayRun)
