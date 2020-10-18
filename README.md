@@ -20,7 +20,7 @@ See also [An Introduction to Game Tree Algorithms](http://www.hamedahmadi.com/ga
 
 ## CLI
 
-Built with [Angular CLI](https://github.com/angular/angular-cli) version 10
+Built with [Angular CLI](https://github.com/angular/angular-cli) version 10  
 PWA (service worker) support: `ng add @angular/pwa`  
 Angular Material: `ng add @angular/material`  
 Web worker for Solver:  `ng generate web-worker base/Solver`  
