@@ -1,6 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { PlayerMode } from '../../base/Model';
-import { MatDialogRef, MAT_DIALOG_DATA, MatChipList } from '@angular/material';
+import { MatChipList } from '@angular/material/chips';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 export interface NewGameData {
     playerMode: PlayerMode;
