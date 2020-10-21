@@ -6,6 +6,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 export interface NewGameData {
     playerMode: PlayerMode;
     cpuLevel: number;
+    isExpertMode: boolean;
 }
 
 export interface NewGameResult {
@@ -29,6 +30,7 @@ export class NewGameComponent {
     title: string;
 
     cpuLevel = 1;
+    showCpuLevel = true;
 
     cpuLevels: CpuLevelItem[] = [{ text: 'Low', value: 0 }, { text: 'Medium', value: 1 }, { text: 'High', value: 2 }];
 
@@ -38,6 +40,7 @@ export class NewGameComponent {
         console.log(`NewGameComponent`, data);
         this.title = data.playerMode ? 'Abort current game and start a new game' : 'Start a new game';
         this.cpuLevel = data.cpuLevel;
+        this.showCpuLevel = !data.isExpertMode;
     }
 
     onPlayerMode(playerMode: PlayerMode) {
@@ -53,7 +56,9 @@ export class NewGameComponent {
     }
 
     onClose(result: NewGameResult) {
-        console.log(`cpuLevel:${this.cpuLevel}`);
+        if( this.showCpuLevel)
+            console.log(`cpuLevel:${this.cpuLevel}`);
+
         this.dialogRef.close(result);
     }
 

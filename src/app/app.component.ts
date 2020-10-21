@@ -112,7 +112,7 @@ export class AppComponent {
     }
 
     adjustCpuLevel() {
-        let depth = [6, 10, 17][this.cpuLevel];
+        let depth = [5, 7, 17][this.cpuLevel];
         this.settings.wolfDepth = this.settings.sheepDepth = depth;
         console.log(`CPU Level:${this.cpuLevel} => ${depth}`)
     }
@@ -258,7 +258,7 @@ export class AppComponent {
     }
 
     onGameNew() {
-        let data: NewGameData = { playerMode: this.playerMode, cpuLevel: this.cpuLevel };
+        let data: NewGameData = { playerMode: this.playerMode, cpuLevel: this.cpuLevel, isExpertMode: this.isExpertMode };
         const dialogRef = this.dialog.open(NewGameComponent, { data: data, autoFocus: false, position: { top: "200px" } });
 
         dialogRef.afterClosed().subscribe(result => {
@@ -271,7 +271,11 @@ export class AppComponent {
             if (result) {
                 let r: NewGameResult = result;
                 this.cpuLevel = r.cpuLevel;
-                this.adjustCpuLevel();
+
+                if (!this.isExpertMode) {
+                    this.adjustCpuLevel();
+                }
+
                 this.startGame(r.playerMode, r.autoplay);
             }
         });
