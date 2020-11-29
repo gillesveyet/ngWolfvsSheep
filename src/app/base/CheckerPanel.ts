@@ -200,7 +200,6 @@ export class CheckerPanel {
 
     private onMouseUpDown(ev: MouseEvent, up: boolean) {
         const rect = this.canvas.getBoundingClientRect();
-        // console.log('getBoundingClientRect:', rect);
         console.log(`onmouse${up ? 'up' : 'down'}  x=${ev.x} y=${ev.y} clientX=${ev.clientX} clientY=${ev.clientY} BouncingRect [top:${rect.top} left:${rect.left} width:${rect.width} height:${rect.height}]`);
 
         //mpuse up and down are all treated as mouse click : allow drag & drop.
