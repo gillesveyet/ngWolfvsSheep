@@ -132,7 +132,7 @@ export class Solver {
 
             gsChild.score = x;
 
-            if (x >= 800) {
+            if (x >= 900) {
                 if (depth === 0) {
                     this.bestGame = gsChild;
                 }
