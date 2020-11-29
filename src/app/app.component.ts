@@ -186,7 +186,7 @@ export class AppComponent {
         let gs = this.getGS();
         //console.log(`handleExpertPlay gs:${gs && !gs.isGameOver} isAutoplayOn:${this.isAutoplayOn} busy:${this.busy}`);
 
-        if (!(gs && !gs.isGameOver && this.isAutoplayOn))
+        if (!(gs && !gs.isGameOver && (this.isAutoplayOn || this.isExpertMode)))
             return;
 
         if (this.isAutoplayRun) {
