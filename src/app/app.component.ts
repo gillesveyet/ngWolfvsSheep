@@ -11,6 +11,7 @@ import { EndGameComponent, EndGameDialogData } from './views/end-game/end-game.c
 import { GameState, GameStatus } from './base/GameState';
 import { SwUpdate } from '@angular/service-worker';
 
+const { version: appVersion } = require('../../package.json')
 
 enum Autoplay {
     Off,
@@ -80,6 +81,8 @@ export class AppComponent {
         this.updates.available.subscribe(e => {
             console.log(`Update available current:${e.current} available:${e.available}`);
         });
+
+        console.log( `Version: ${appVersion}`);
     }
 
     ngOnInit() {
