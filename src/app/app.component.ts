@@ -9,6 +9,7 @@ import { Pos } from './base/Pos';
 import { NewGameComponent, NewGameData, NewGameResult } from './views/new-game/new-game.component';
 import { EndGameComponent, EndGameDialogData } from './views/end-game/end-game.component';
 import { GameState, GameStatus } from './base/GameState';
+import { SwUpdate } from '@angular/service-worker';
 
 
 enum Autoplay {
@@ -67,12 +68,17 @@ export class AppComponent {
 
     constructor(
         public dialog: MatDialog,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private readonly updates: SwUpdate
     ) {
         this.route.queryParams.subscribe(params => {
             //note: this is called twice on app startup
             this.isExpertMode = params['expert'] !== undefined;
             console.log(`isExpertMode:${this.isExpertMode} params:`, params);
+        });
+
+        this.updates.available.subscribe(e => {
+            console.log(`Update available current:${e.current} available:${e.available}`);
         });
     }
 
