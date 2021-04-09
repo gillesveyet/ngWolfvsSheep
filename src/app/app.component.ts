@@ -10,8 +10,7 @@ import { NewGameComponent, NewGameData, NewGameResult } from './views/new-game/n
 import { EndGameComponent, EndGameDialogData } from './views/end-game/end-game.component';
 import { GameState, GameStatus } from './base/GameState';
 import { SwUpdate } from '@angular/service-worker';
-
-const { version: appVersion } = require('../../package.json')
+import { version as appVersion } from '../../package.json';
 
 enum Autoplay {
     Off,
