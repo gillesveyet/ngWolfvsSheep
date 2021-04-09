@@ -41,7 +41,7 @@ See also src/manifest.webmanifest (PWA support) :
 "start_url": "/sheep/",
 ```
 
-Test with http-server: `http-server -p 8182 dist`
+Test with http-server: `http-server -p 8182 -c-1 dist`
 
 # Credits
 
