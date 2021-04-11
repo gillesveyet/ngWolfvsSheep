@@ -5,7 +5,6 @@ import { FormsModule } from '@angular/forms'; // for NgModel
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialogModule } from '@angular/material/dialog';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -32,7 +31,6 @@ import { NewGameComponent } from './views/new-game/new-game.component';
         MatButtonModule,
         MatChipsModule,
         MatDialogModule,
-        MatProgressSpinnerModule,
         MatToolbarModule,
         ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
         BrowserAnimationsModule

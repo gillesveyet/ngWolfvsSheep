@@ -36,8 +36,9 @@
             </div>
 
             <div class="board">
-                <mat-spinner *ngIf="showSpinner" [diameter]="200" [color]="'accent'" class="spinner"></mat-spinner>
-                <canvas #canBoard tabindex=0 class="can-board" width="600" height="600"></canvas>
+                <!-- <mat-spinner *ngIf="showSpinner" [diameter]="200" [color]="'accent'" class="spinner"></mat-spinner> -->
+                <canvas #canvasBack class="canvas-back" width="600" height="600"></canvas>
+                <canvas #canvasGame class="canvas-game" width="600" height="600" tabindex=0></canvas>
             </div>
 
             <div class="status">

@@ -1,13 +1,26 @@
-.can-board {
+.canvas-back {
+    z-index: 1;
+    background-size: contain;
     border: 1px solid black;
+
+    //Note: canvas drawing surface (600x600) is and can only set in HTML.
+    width: 100%;
+}
+
+.canvas-game {
+    z-index: 2;
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
     background-size: contain;
 
     //Note: canvas drawing surface (600x600) is and can only set in HTML.
     width: 100%;
 }
 
-.board > .spinner {
-    position: absolute;
-    top: 30%;
-    left: 30%;
-}
+
+// .board > .spinner {
+//     position: absolute;
+//     top: 30%;
+//     left: 30%;
+// }

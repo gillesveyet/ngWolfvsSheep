@@ -63,7 +63,8 @@ export class AppComponent {
         return this.autoplay === Autoplay.Pausing;
     }
 
-    @ViewChild('canBoard', { static: true }) canvasRef: ElementRef;
+    @ViewChild('canvasBack', { static: true }) canvasBack: ElementRef;
+    @ViewChild('canvasGame', { static: true }) canvasGame: ElementRef;
     @ViewChild('fileSaver', { static: true }) fileSaver: ElementRef;
 
     constructor(
@@ -89,7 +90,14 @@ export class AppComponent {
 
         this.adjustCpuLevel();
 
-        this.checker = new CheckerPanel(this.canvasRef.nativeElement);
+
+        // test
+        // this.status = 'Hello Boy';
+        // (document.querySelector('.loader') as HTMLElement).style.display = 'none';
+        // return;
+        // end test
+
+        this.checker = new CheckerPanel(this.canvasBack.nativeElement, this.canvasGame.nativeElement);
 
         this.checker.onGetValidMoves = (selected: Pos) => {
             return this.getGS().getValidMoves(selected);
@@ -271,10 +279,6 @@ export class AppComponent {
 
         dialogRef.afterClosed().subscribe(result => {
             console.log(`NewGame dialog result:`, result);
-
-            //set focus on canvas to remove focus from "New Game" button (would appear greyed otherwise).
-            //note that canvas is not focusable by default, I needed to add "tabindex=0"
-            this.canvasRef.nativeElement.focus();
 
             if (result) {
                 let r: NewGameResult = result;

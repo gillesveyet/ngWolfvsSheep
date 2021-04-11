@@ -22,8 +22,10 @@ export class CheckerPanel {
     private selectedPiece: Pos = null;
     private validMoves: Pos[] = null;
 
-    private canvas: HTMLCanvasElement
-    private ctx: CanvasRenderingContext2D;
+    private canvasGame: HTMLCanvasElement
+    private canvasBack: HTMLCanvasElement
+    private ctxGame: CanvasRenderingContext2D;
+    private ctxBack: CanvasRenderingContext2D;
     private XMAG: number;
     private YMAG: number;
 
@@ -32,20 +34,22 @@ export class CheckerPanel {
     private get imgWolf(): HTMLImageElement { return this.bitmaps[Bitmap.Black] }
     private get imgSheep(): HTMLImageElement { return this.bitmaps[Bitmap.White] }
 
-    constructor(canvas: HTMLCanvasElement) {
-        this.canvas = canvas;
+    constructor(canvasBack: HTMLCanvasElement, canvasGame: HTMLCanvasElement) {
+        this.canvasBack = canvasBack;
+        this.canvasGame = canvasGame;
 
-        this.canvas.onmousedown = (ev: MouseEvent) => { this.onMouseUpDown(ev, false) };
-        this.canvas.onmouseup = (ev: MouseEvent) => { this.onMouseUpDown(ev, true) };
+        if (!this.canvasGame.getContext)
+        throw 'Browser does not support Canvas';
 
-        if (!this.canvas.getContext)
-            throw 'Browser does not support Canvas';
+        this.canvasGame.onmousedown = (ev: MouseEvent) => { this.onMouseUpDown(ev, false) };
+        this.canvasGame.onmouseup = (ev: MouseEvent) => { this.onMouseUpDown(ev, true) };
 
-        this.ctx = this.canvas.getContext('2d', { alpha: false });
-        this.XMAG = this.canvas.width / 10;
-        this.YMAG = this.canvas.height / 10;
+        this.ctxBack = this.canvasBack.getContext('2d', { alpha: false });
+        this.ctxGame = this.canvasGame.getContext('2d', { alpha: true });
+        this.XMAG = this.canvasGame.width / 10;
+        this.YMAG = this.canvasGame.height / 10;
 
-        console.log(`Canvas width:${this.canvas.width} height:${this.canvas.height}`);
+        console.log(`Canvas width:${this.canvasGame.width} height:${this.canvasGame.height}`);
     }
 
     init() {
@@ -57,6 +61,7 @@ export class CheckerPanel {
 
                 img.onload = () => {
                     if (++count === 2) {
+                        this.drawChecker();
                         observer.next();
                         observer.complete();
                     }
@@ -66,6 +71,8 @@ export class CheckerPanel {
             }
         });
     }
+
+
 
     setPositions(gs: GameState, enablePlay: boolean): void {
         this.selectedPiece = null;
@@ -97,11 +104,13 @@ export class CheckerPanel {
 
 
     private onPaint(): void {
-        this.drawChecker();
-
         if (!this.gameState)
             return;
 
+        // this.ctxGame.fillStyle = "rgba(0,0,0,0)";
+        // this.ctxGame.fillRect(0, 0, this.XMAG * 10, this.YMAG * 10);
+
+        this.ctxGame.clearRect(0, 0, this.canvasGame.width, this.canvasGame.height);
 
         this.drawSquare(this.imgWolf, this.gameState.wolf.x, this.gameState.wolf.y);
 
@@ -133,24 +142,24 @@ export class CheckerPanel {
     }
 
     private drawChecker() {
-        this.ctx.fillStyle = "rgb(250,222,93)";
-        this.ctx.fillRect(0, 0, this.XMAG * 10, this.YMAG * 10);
+        this.ctxBack.fillStyle = "rgb(250,222,93)";
+        this.ctxBack.fillRect(0, 0, this.XMAG * 10, this.YMAG * 10);
 
-        this.ctx.fillStyle = "rgb(150,52,19)";
+        this.ctxBack.fillStyle = "rgb(150,52,19)";
 
         for (let i = 0; i < 5; ++i)
             for (let j = 0; j < 10; ++j)
-                this.ctx.fillRect((i * 2 + (j + 1) % 2) * this.XMAG, j * this.YMAG, this.XMAG, this.YMAG);
+                this.ctxBack.fillRect((i * 2 + (j + 1) % 2) * this.XMAG, j * this.YMAG, this.XMAG, this.YMAG);
     }
 
     private drawSquare(image: HTMLImageElement, x: number, y: number) {
-        this.ctx.drawImage(image, x * this.XMAG, y * this.YMAG, this.XMAG, this.YMAG);
+        this.ctxGame.drawImage(image, x * this.XMAG, y * this.YMAG, this.XMAG, this.YMAG);
     }
 
     private drawSelected(p: Pos, color: Color): void {
-        this.ctx.lineWidth = 2;
-        this.ctx.strokeStyle = Color[color];
-        this.ctx.strokeRect(p.x * this.XMAG, p.y * this.YMAG, this.XMAG, this.YMAG);
+        this.ctxGame.lineWidth = 2;
+        this.ctxGame.strokeStyle = Color[color];
+        this.ctxGame.strokeRect(p.x * this.XMAG, p.y * this.YMAG, this.XMAG, this.YMAG);
     }
 
 
@@ -199,7 +208,7 @@ export class CheckerPanel {
     }
 
     private onMouseUpDown(ev: MouseEvent, up: boolean) {
-        const rect = this.canvas.getBoundingClientRect();
+        const rect = this.canvasGame.getBoundingClientRect();
         console.log(`onmouse${up ? 'up' : 'down'}  x=${ev.x} y=${ev.y} clientX=${ev.clientX} clientY=${ev.clientY} BouncingRect [top:${rect.top} left:${rect.left} width:${rect.width} height:${rect.height}]`);
 
         //mpuse up and down are all treated as mouse click : allow drag & drop.

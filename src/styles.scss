@@ -1,4 +1,4 @@
-$font: Roboto, 'Helvetica Neue', sans-serif;
+$font: Roboto, "Helvetica Neue", sans-serif;
 
 // css rules added by ng add @angular/material
 // See "Height transfer" explanation: http://book.mixu.net/css/5-tricks.html
@@ -87,6 +87,7 @@ $font: Roboto, 'Helvetica Neue', sans-serif;
 }
 
 .content {
+    background-color: lightskyblue;
     overflow: auto;
     display: flex;
     flex-direction: column;
@@ -105,7 +106,7 @@ $font: Roboto, 'Helvetica Neue', sans-serif;
 }
 
 .menu {
-    //background-color: azure;
+    background-color: azure;
     display: flex;
     flex-direction: row;
 
@@ -115,7 +116,6 @@ $font: Roboto, 'Helvetica Neue', sans-serif;
 }
 
 .settings {
-    //background-color: lightskyblue;
     display: flex;
     flex-direction: row;
 
@@ -129,6 +129,9 @@ $font: Roboto, 'Helvetica Neue', sans-serif;
 }
 
 .board {
+    background-color: lightpink;
+    // border: 1px solid black;
+    // box-sizing: border-box;
     flex: 0 1;
     margin: 10px;
     max-width: 600px;
@@ -136,6 +139,6 @@ $font: Roboto, 'Helvetica Neue', sans-serif;
 }
 
 .status {
-    //background-color: lightgreen;
-    margin-left: 10px;
+    background-color: lightgreen;
+    margin-left: 5px;
 }
