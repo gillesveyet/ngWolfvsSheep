@@ -18,9 +18,13 @@
     width: 100%;
 }
 
-
-// .board > .spinner {
-//     position: absolute;
-//     top: 30%;
-//     left: 30%;
-// }
+.busy-box{
+    z-index: 3;
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    width: 100%;
+    box-sizing: border-box;
+    border: 8px solid rgb(190, 93, 182);
+    background-color: transparent;
+}
