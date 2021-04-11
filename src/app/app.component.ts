@@ -29,7 +29,7 @@ export class AppComponent {
     playerMode: PlayerMode = PlayerMode.None;
     cpuLevel = 2;    // 0=Low, 1=Medium, 2=High
     isExpertMode = false;
-    showSpinner = false;
+    showBusy = false;
     autoplay: Autoplay = Autoplay.Off;
     autoplayDelay = 150;    // delay in ms.
     settings = { wolfDepth: 0, sheepDepth: 0 };
@@ -153,7 +153,7 @@ export class AppComponent {
         this.checker.setPositions(gs, !gs.isGameOver && !auto);
         this.displayInfo();
         this.busy = false;
-        this.showSpinner = false;
+        this.showBusy = false;
 
         if (auto)
             this.makeAutoplay();
@@ -178,7 +178,7 @@ export class AppComponent {
     }
 
     makeCpuPlay(): void {
-        this.showSpinner = true;
+        this.showBusy = true;
         this.displayStatus('Computer is thinking...');
         this.cpuPlay();
     }

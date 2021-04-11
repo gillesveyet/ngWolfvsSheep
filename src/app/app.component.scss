@@ -1,8 +1,6 @@
 .canvas-back {
     z-index: 1;
-    background-size: contain;
-    border: 1px solid black;
-
+    border: 1px solid black;    // do not remove border otherwise canvas-game is not positioned correctly
     //Note: canvas drawing surface (600x600) is and can only set in HTML.
     width: 100%;
 }
@@ -12,7 +10,6 @@
     position: absolute;
     top: 0px;
     bottom: 0px;
-    background-size: contain;
 
     //Note: canvas drawing surface (600x600) is and can only set in HTML.
     width: 100%;
