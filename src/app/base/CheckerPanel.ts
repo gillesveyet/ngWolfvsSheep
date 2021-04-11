@@ -41,7 +41,7 @@ export class CheckerPanel {
         if (!this.canvas.getContext)
             throw 'Browser does not support Canvas';
 
-        this.ctx = this.canvas.getContext('2d');
+        this.ctx = this.canvas.getContext('2d', { alpha: false });
         this.XMAG = this.canvas.width / 10;
         this.YMAG = this.canvas.height / 10;
 
@@ -140,7 +140,7 @@ export class CheckerPanel {
 
         for (let i = 0; i < 5; ++i)
             for (let j = 0; j < 10; ++j)
-                this.ctx.fillRect((i * 2 + (j+1) % 2) * this.XMAG, j * this.YMAG, this.XMAG, this.YMAG);
+                this.ctx.fillRect((i * 2 + (j + 1) % 2) * this.XMAG, j * this.YMAG, this.XMAG, this.YMAG);
     }
 
     private drawSquare(image: HTMLImageElement, x: number, y: number) {
