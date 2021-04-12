@@ -39,7 +39,7 @@ export class CheckerPanel {
         this.canvasGame = canvasGame;
 
         if (!this.canvasGame.getContext)
-        throw 'Browser does not support Canvas';
+            throw 'Browser does not support Canvas';
 
         this.canvasGame.onmousedown = (ev: MouseEvent) => { this.onMouseUpDown(ev, false) };
         this.canvasGame.onmouseup = (ev: MouseEvent) => { this.onMouseUpDown(ev, true) };
