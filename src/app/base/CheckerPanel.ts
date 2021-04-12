@@ -16,10 +16,16 @@ enum Bitmap {
 class Point {
     x: number;
     y: number;
+
     constructor(x: number, y: number) {
         this.x = x;
         this.y = y;
     }
+
+    toString() {
+        return `(${this.x.toFixed(2)},${this.y.toFixed(2)})`;
+    }
+
 }
 
 
@@ -308,22 +314,33 @@ export class CheckerPanel {
         let t = ev.touches[0];
         let pt = this.getPoint(t.clientX, t.clientY);
 
-        // for (let p of this.validMoves) {
-        // }
+        let x = -1, y = -1;
 
-        // if (!Pos.isValid(x, y))
-        //     return;
+        let start = this.posStartDrag;
 
-        // let p = Pos.getPos(x, y);
+        for (let p of this.validMoves) {
+            let xs = Math.sign(pt.x - start.x);
+            let ys = Math.sign(pt.y - start.y);
 
-        // if (!this.isMoveValid(p))
-        //     return;
+            if (xs === Math.sign(p.x - start.x) && ys === Math.sign(p.y - start.y)) {
+
+                let d = Math.min(Math.abs(pt.x - start.x), Math.abs(pt.y - start.y), 1);
+                x = start.x + xs * d;
+                y = start.y + ys * d;
+
+                console.log(`onTouchMove pt:${pt} start:${start} move:${p}`);
+                break;
+            }
+        }
+
+        if (x < 0)
+            return;
 
         let prev = this.pointLastDrag;
-        this.pointLastDrag = pt;
+        this.pointLastDrag = new Point(x,y);
 
         this.ctxGame.clearRect((prev.x) * this.XMAG | 0, (prev.y) * this.YMAG | 0, this.XMAG, this.YMAG);
-        this.drawSquare(this.gameState.isWolf ? this.imgWolf : this.imgSheep, pt.x, pt.y);
+        this.drawSquare(this.gameState.isWolf ? this.imgWolf : this.imgSheep, x, y);
     }
 
 
