@@ -39,8 +39,8 @@ export class CheckerPanel {
     private ctxBack: CanvasRenderingContext2D;
     private XMAG: number;
     private YMAG: number;
-    private pointLastTouchMove: Point = null;
     private posLastClickDown: Pos = null;
+    private pointLastDrag: Point = null;    // if null drag is not allowed.
 
     private bitmaps = {};
 
@@ -172,7 +172,7 @@ export class CheckerPanel {
     }
 
     private drawSquare(image: HTMLImageElement, x: number, y: number) {
-        this.ctxGame.drawImage(image, x * this.XMAG, y * this.YMAG, this.XMAG, this.YMAG);
+        this.ctxGame.drawImage(image, x * this.XMAG | 0, y * this.YMAG | 0, this.XMAG, this.YMAG);
     }
 
     private drawSelected(p: Pos, color: Color): void {
@@ -228,15 +228,25 @@ export class CheckerPanel {
         return false;
     }
 
+    private getPoint(canvasX: number, canvasY: number) {
+        const rect = this.canvasGame.getBoundingClientRect();
+        let x = (canvasX - rect.left) * 10 / rect.width;
+        let y = (canvasY - rect.top) * 10 / rect.height;
+
+        return new Point(x, y);
+    }
+
     private onMouseUpDown(ev: MouseEvent, up: boolean) {
         console.log(`onmouse${up ? 'up' : 'down'}  clientX=${ev.clientX} clientY=${ev.clientY}`); // BouncingRect [top:${rect.top} left:${rect.left} width:${rect.width} height:${rect.height}]`);
-        this.onClick(new Point(ev.clientX, ev.clientY), up);
-    };
+        this.onClick(this.getPoint(ev.clientX, ev.clientY), up);
+    }
+
 
     private onClick(pt: Point, up: boolean) {
-        const rect = this.canvasGame.getBoundingClientRect();
-        let x = (pt.x - rect.left) * 10 / rect.width | 0;
-        let y = (pt.y - rect.top) * 10 / rect.height | 0;
+        this.pointLastDrag = null;
+
+        let x = pt.x | 0;
+        let y = pt.y | 0;
 
         console.log(`onClick - x=${x} y=${y} selected=${this.selectedPiece}`);
 
@@ -253,8 +263,8 @@ export class CheckerPanel {
                 return;
         } else {
             this.posLastClickDown = p;
+            this.pointLastDrag = pt;
         }
-
 
         if (!this.gameState.isWolf && this.isSheep(p))
             this.updateSelected(p, true);
@@ -267,12 +277,14 @@ export class CheckerPanel {
 
         if (up) {
             ev.preventDefault();
-            pt = this.pointLastTouchMove;
+            pt = this.pointLastDrag;
+
+            if (!pt)
+                return;
         }
         else {
             let t = ev.touches[0];
-            if (t)
-                pt = new Point(t.clientX, t.clientY);
+            pt = this.getPoint(t.clientX, t.clientY);
         }
 
         console.log(`onTouch${up ? 'End' : 'Start'} clientX=${pt?.x} clientY=${pt?.y}`, ev);
@@ -281,15 +293,23 @@ export class CheckerPanel {
 
     private onTouchCancel(ev: TouchEvent) {
         console.log('onTouchCancel', ev);
-        this.pointLastTouchMove = null
+        this.pointLastDrag = null;
     }
 
+
     private onTouchMove(ev: TouchEvent) {
-        console.log('onTouchMove', ev);
+        // console.log('onTouchMove', ev);
         ev.preventDefault();
 
+        if (!this.pointLastDrag)
+            return;
+
+        let prev = this.pointLastDrag;
         let t = ev.touches[0];
-        this.pointLastTouchMove = t ? new Point(t.clientX, t.clientY) : null;
+        let pt = this.getPoint(t.clientX, t.clientY);
+        this.pointLastDrag = pt;
+
+        //this.drawSquare(this.imgSheep, pt.x - 0.5, pt.y - 0.5);
     }
 
 
