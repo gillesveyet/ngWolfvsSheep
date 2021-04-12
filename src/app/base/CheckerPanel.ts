@@ -3,8 +3,9 @@ import { Observable } from 'rxjs';
 import { GameState } from './GameState';
 
 enum Color {
-    Black,
+    //Black,
     Aqua,
+    LightBlue
 }
 
 enum Bitmap {
@@ -111,9 +112,14 @@ export class CheckerPanel {
 
         this.drawSquare(this.imgWolf, this.gameState.wolf.x, this.gameState.wolf.y);
 
-        for (let ps of this.gameState.sheep)
+        let selectSheep = !this.gameState.isWolf && this.isPlayEnabled && this.selectedPiece === null;
+        
+        for (let ps of this.gameState.sheep) {
             this.drawSquare(this.imgSheep, ps.x, ps.y);
 
+            if (selectSheep)
+                this.drawSelected(ps, Color.LightBlue);
+        }
 
         // To check if order of sheep position is correct
         // if (IsExpertMode)
@@ -131,7 +137,7 @@ export class CheckerPanel {
         // }
 
         if (this.selectedPiece !== null)
-            this.drawSelected(this.selectedPiece, Color.Black);
+            this.drawSelected(this.selectedPiece, Color.LightBlue);
 
         if (this.validMoves !== null)
             for (let p of this.validMoves)
