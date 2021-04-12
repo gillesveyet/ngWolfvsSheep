@@ -107,9 +107,6 @@ export class CheckerPanel {
         if (!this.gameState)
             return;
 
-        // this.ctxGame.fillStyle = "rgba(0,0,0,0)";
-        // this.ctxGame.fillRect(0, 0, this.XMAG * 10, this.YMAG * 10);
-
         this.ctxGame.clearRect(0, 0, this.canvasGame.width, this.canvasGame.height);
 
         this.drawSquare(this.imgWolf, this.gameState.wolf.x, this.gameState.wolf.y);
