@@ -63,6 +63,7 @@ export class CheckerPanel {
 
         this.canvasGame.onmousedown = (ev: MouseEvent) => this.onMouseUpDown(ev, false);
         this.canvasGame.onmouseup = (ev: MouseEvent) => this.onMouseUpDown(ev, true);
+        this.canvasGame.onmousemove = (ev: MouseEvent) => this.onMouseMove(ev);
         this.canvasGame.ontouchstart = (ev: TouchEvent) => this.onTouchStartEnd(ev, false);
         this.canvasGame.ontouchend = (ev: TouchEvent) => this.onTouchStartEnd(ev, true);
         this.canvasGame.ontouchmove = (ev: TouchEvent) => this.onTouchMove(ev);
@@ -243,12 +244,6 @@ export class CheckerPanel {
         return new Point(x, y);
     }
 
-    private onMouseUpDown(ev: MouseEvent, up: boolean) {
-        console.log(`onmouse${up ? 'up' : 'down'}  clientX=${ev.clientX} clientY=${ev.clientY}`); // BouncingRect [top:${rect.top} left:${rect.left} width:${rect.width} height:${rect.height}]`);
-        this.onClick(this.getPoint(ev.clientX, ev.clientY), up);
-    }
-
-
     private onClick(pt: Point, up: boolean) {
         let clean = !!this.posStartDrag;
 
@@ -290,41 +285,10 @@ export class CheckerPanel {
         return true;
     }
 
-    private onTouchStartEnd(ev: TouchEvent, up: boolean) {
-        let pt: Point = null;
-
-        if (up) {
-            ev.preventDefault();
-            pt = this.pointLastDrag;
-
-            if (!pt)
-                return;
-        }
-        else {
-            let t = ev.touches[0];
-            pt = this.getPoint(t.clientX, t.clientY);
-        }
-
-        console.log(`onTouch${up ? 'End' : 'Start'} clientX=${pt?.x} clientY=${pt?.y}`, ev);
-        this.onClick(pt, up);
-    }
-
-    private onTouchCancel(ev: TouchEvent) {
-        console.log('onTouchCancel', ev);
-        this.posStartDrag = null;
-        this.onPaint(); //clean drag drop
-    }
-
-
-    private onTouchMove(ev: TouchEvent) {
-        // console.log('onTouchMove', ev);
-        ev.preventDefault();
+    private onMove(pt: Point) {
 
         if (!this.posStartDrag || this.validMoves === null)
             return;
-
-        let t = ev.touches[0];
-        let pt = this.getPoint(t.clientX, t.clientY);
 
         let move: Pos = null;
         let xs, ys: number;
@@ -362,6 +326,52 @@ export class CheckerPanel {
 
         this.pointLastDrag = new Point(x, y);
     }
+
+    private onMouseUpDown(ev: MouseEvent, up: boolean) {
+        console.log(`onmouse${up ? 'up' : 'down'}  clientX=${ev.clientX} clientY=${ev.clientY}`); // BouncingRect [top:${rect.top} left:${rect.left} width:${rect.width} height:${rect.height}]`);
+        this.onClick(this.getPoint(ev.clientX, ev.clientY), up);
+    }
+
+    private onMouseMove(ev: MouseEvent) {
+        //console.log('onMouseUpMove', ev);
+        let pt = this.getPoint(ev.clientX, ev.clientY);
+        this.onMove(pt);
+    }
+
+    private onTouchStartEnd(ev: TouchEvent, up: boolean) {
+        let pt: Point = null;
+
+        if (up) {
+            ev.preventDefault();
+            pt = this.pointLastDrag;
+
+            if (!pt)
+                return;
+        }
+        else {
+            let t = ev.touches[0];
+            pt = this.getPoint(t.clientX, t.clientY);
+        }
+
+        console.log(`onTouch${up ? 'End' : 'Start'} clientX=${pt?.x} clientY=${pt?.y}`, ev);
+        this.onClick(pt, up);
+    }
+
+    private onTouchCancel(ev: TouchEvent) {
+        console.log('onTouchCancel', ev);
+        this.posStartDrag = null;
+        this.onPaint(); //clean drag drop
+    }
+
+
+    private onTouchMove(ev: TouchEvent) {
+        // console.log('onTouchMove', ev);
+        ev.preventDefault();
+        let t = ev.touches[0];
+        let pt = this.getPoint(t.clientX, t.clientY);
+        this.onMove(pt);
+    }
+
 
 
 }
