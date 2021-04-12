@@ -5,7 +5,8 @@ import { GameState } from './GameState';
 enum Color {
     LightGray,
     Aqua,
-    LightBlue
+    LightBlue,
+    Fuchsia,
 }
 
 enum Bitmap {
@@ -249,6 +250,14 @@ export class CheckerPanel {
 
 
     private onClick(pt: Point, up: boolean) {
+        let clean = !!this.posStartDrag;
+
+        if (!this.onClick_(pt, up) && clean)
+            this.onPaint(); //clean drag drop
+    }
+
+
+    private onClick_(pt: Point, up: boolean): boolean {
         let posStart = this.posStartDrag;
         this.posStartDrag = null;
 
@@ -258,25 +267,27 @@ export class CheckerPanel {
         console.log(`onClick - x=${x} y=${y} selected=${this.selectedPiece}`);
 
         if (!this.isPlayEnabled)
-            return;
+            return false;
 
         if (!Pos.isValid(x, y))
-            return;
+            return false;
 
         let p = Pos.getPos(x, y);
 
         if (up) {
             if (p.equals(posStart))
-                return;
+                return false;
         } else {
             this.posStartDrag = p;
-            this.pointLastDrag = new Point(x, y);
+            this.pointLastDrag = null;
         }
 
         if (!up && !this.gameState.isWolf && this.isSheep(p))
             this.updateSelected(p, true);
         else if (this.selectedPiece !== null && this.isMoveValid(p) && this.onMovePiece)
             this.onMovePiece(this.selectedPiece, p);
+
+        return true;
     }
 
     private onTouchStartEnd(ev: TouchEvent, up: boolean) {
@@ -301,6 +312,7 @@ export class CheckerPanel {
     private onTouchCancel(ev: TouchEvent) {
         console.log('onTouchCancel', ev);
         this.posStartDrag = null;
+        this.onPaint(); //clean drag drop
     }
 
 
@@ -314,33 +326,41 @@ export class CheckerPanel {
         let t = ev.touches[0];
         let pt = this.getPoint(t.clientX, t.clientY);
 
-        let x = -1, y = -1;
+        let move: Pos = null;
+        let xs, ys: number;
 
         let start = this.posStartDrag;
 
         for (let p of this.validMoves) {
-            let xs = Math.sign(pt.x - start.x);
-            let ys = Math.sign(pt.y - start.y);
+            xs = Math.sign(pt.x - start.x);
+            ys = Math.sign(pt.y - start.y);
 
             if (xs === Math.sign(p.x - start.x) && ys === Math.sign(p.y - start.y)) {
+                move = p;
 
-                let d = Math.min(Math.abs(pt.x - start.x), Math.abs(pt.y - start.y), 1);
-                x = start.x + xs * d;
-                y = start.y + ys * d;
-
-                console.log(`onTouchMove pt:${pt} start:${start} move:${p}`);
+                // console.log(`onTouchMove pt:${pt} start:${start} move:${p}`);
                 break;
             }
         }
 
-        if (x < 0)
+        let d = Math.min(Math.abs(pt.x - start.x), Math.abs(pt.y - start.y), 1);
+        let x = start.x + xs * d;
+        let y = start.y + ys * d;
+        let moveOk = d >= 0.5;
+
+        if (!move)
             return;
 
         let prev = this.pointLastDrag;
-        this.pointLastDrag = new Point(x,y);
+
+        if (prev == null)
+            prev = new Point(this.posStartDrag.x, this.posStartDrag.y);
 
         this.ctxGame.clearRect((prev.x) * this.XMAG | 0, (prev.y) * this.YMAG | 0, this.XMAG, this.YMAG);
+        this.drawSelected(move, moveOk ? Color.Fuchsia : Color.Aqua);
         this.drawSquare(this.gameState.isWolf ? this.imgWolf : this.imgSheep, x, y);
+
+        this.pointLastDrag = new Point(x, y);
     }
 
 
