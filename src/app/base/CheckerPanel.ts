@@ -39,8 +39,8 @@ export class CheckerPanel {
     private ctxBack: CanvasRenderingContext2D;
     private XMAG: number;
     private YMAG: number;
-    private posLastClickDown: Pos = null;
-    private pointLastDrag: Point = null;    // if null drag is not allowed.
+    private posStartDrag: Pos = null;   // if null drag is not allowed.
+    private pointLastDrag: Point = null;
 
     private bitmaps = {};
 
@@ -230,8 +230,8 @@ export class CheckerPanel {
 
     private getPoint(canvasX: number, canvasY: number) {
         const rect = this.canvasGame.getBoundingClientRect();
-        let x = (canvasX - rect.left) * 10 / rect.width;
-        let y = (canvasY - rect.top) * 10 / rect.height;
+        let x = (canvasX - rect.left) * 10 / rect.width - 0.5;
+        let y = (canvasY - rect.top) * 10 / rect.height - 0.5;
 
         return new Point(x, y);
     }
@@ -243,10 +243,11 @@ export class CheckerPanel {
 
 
     private onClick(pt: Point, up: boolean) {
-        this.pointLastDrag = null;
+        let posStart = this.posStartDrag;
+        this.posStartDrag = null;
 
-        let x = pt.x | 0;
-        let y = pt.y | 0;
+        let x = Math.round(pt.x) | 0;
+        let y = Math.round(pt.y) | 0;
 
         console.log(`onClick - x=${x} y=${y} selected=${this.selectedPiece}`);
 
@@ -259,14 +260,14 @@ export class CheckerPanel {
         let p = Pos.getPos(x, y);
 
         if (up) {
-            if (p.equals(this.posLastClickDown))
+            if (p.equals(posStart))
                 return;
         } else {
-            this.posLastClickDown = p;
-            this.pointLastDrag = new Point(x + 0.5, y + 0.5);
+            this.posStartDrag = p;
+            this.pointLastDrag = new Point(x, y);
         }
 
-        if (!this.gameState.isWolf && this.isSheep(p))
+        if (!up && !this.gameState.isWolf && this.isSheep(p))
             this.updateSelected(p, true);
         else if (this.selectedPiece !== null && this.isMoveValid(p) && this.onMovePiece)
             this.onMovePiece(this.selectedPiece, p);
@@ -293,7 +294,7 @@ export class CheckerPanel {
 
     private onTouchCancel(ev: TouchEvent) {
         console.log('onTouchCancel', ev);
-        this.pointLastDrag = null;
+        this.posStartDrag = null;
     }
 
 
@@ -301,16 +302,28 @@ export class CheckerPanel {
         // console.log('onTouchMove', ev);
         ev.preventDefault();
 
-        if (!this.pointLastDrag)
+        if (!this.posStartDrag || this.validMoves === null)
             return;
 
-        let prev = this.pointLastDrag;
         let t = ev.touches[0];
         let pt = this.getPoint(t.clientX, t.clientY);
+
+        // for (let p of this.validMoves) {
+        // }
+
+        // if (!Pos.isValid(x, y))
+        //     return;
+
+        // let p = Pos.getPos(x, y);
+
+        // if (!this.isMoveValid(p))
+        //     return;
+
+        let prev = this.pointLastDrag;
         this.pointLastDrag = pt;
 
-        this.ctxGame.clearRect((prev.x - 0.5) * this.XMAG | 0, (prev.y - 0.5) * this.YMAG | 0, this.XMAG, this.YMAG);
-        this.drawSquare(this.imgSheep, pt.x - 0.5, pt.y - 0.5);
+        this.ctxGame.clearRect((prev.x) * this.XMAG | 0, (prev.y) * this.YMAG | 0, this.XMAG, this.YMAG);
+        this.drawSquare(this.gameState.isWolf ? this.imgWolf : this.imgSheep, pt.x, pt.y);
     }
 
 
