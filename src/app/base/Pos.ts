@@ -71,7 +71,7 @@ export class Pos {
     // }
 
     equals(other: Pos): boolean {
-        return this.pval === other.pval;
+        return this.pval === other?.pval;
     }
 
     toString() {

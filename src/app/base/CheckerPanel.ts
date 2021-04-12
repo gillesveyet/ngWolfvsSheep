@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { GameState } from './GameState';
 
 enum Color {
-    //Black,
+    LightGray,
     Aqua,
     LightBlue
 }
@@ -39,7 +39,8 @@ export class CheckerPanel {
     private ctxBack: CanvasRenderingContext2D;
     private XMAG: number;
     private YMAG: number;
-    private touchLastPos: Point = null;
+    private pointLastTouchMove: Point = null;
+    private posLastClickDown: Pos = null;
 
     private bitmaps = {};
 
@@ -152,7 +153,7 @@ export class CheckerPanel {
         // }
 
         if (this.selectedPiece !== null)
-            this.drawSelected(this.selectedPiece, Color.LightBlue);
+            this.drawSelected(this.selectedPiece, Color.LightGray);
 
         if (this.validMoves !== null)
             for (let p of this.validMoves)
@@ -182,6 +183,8 @@ export class CheckerPanel {
 
 
     private updateSelected(selected: Pos, refresh: boolean): void {
+        //console.log(`updateSelected ${selected} refresh:${refresh} selectedPiece:${this.selectedPiece}`);
+
         if (this.selectedPiece === null && selected === null)
             return;
 
@@ -227,12 +230,10 @@ export class CheckerPanel {
 
     private onMouseUpDown(ev: MouseEvent, up: boolean) {
         console.log(`onmouse${up ? 'up' : 'down'}  clientX=${ev.clientX} clientY=${ev.clientY}`); // BouncingRect [top:${rect.top} left:${rect.left} width:${rect.width} height:${rect.height}]`);
-
-        //mpuse up and down are all treated as mouse click : allow drag & drop.
-        this.onClick(new Point(ev.clientX, ev.clientY));
+        this.onClick(new Point(ev.clientX, ev.clientY), up);
     };
 
-    private onClick(pt: Point) {
+    private onClick(pt: Point, up: boolean) {
         const rect = this.canvasGame.getBoundingClientRect();
         let x = (pt.x - rect.left) * 10 / rect.width | 0;
         let y = (pt.y - rect.top) * 10 / rect.height | 0;
@@ -247,18 +248,26 @@ export class CheckerPanel {
 
         let p = Pos.getPos(x, y);
 
+        if (up) {
+            if (p.equals(this.posLastClickDown))
+                return;
+        } else {
+            this.posLastClickDown = p;
+        }
+
+
         if (!this.gameState.isWolf && this.isSheep(p))
             this.updateSelected(p, true);
         else if (this.selectedPiece !== null && this.isMoveValid(p) && this.onMovePiece)
             this.onMovePiece(this.selectedPiece, p);
     }
 
-    private onTouchStartEnd(ev: TouchEvent, end: boolean) {
+    private onTouchStartEnd(ev: TouchEvent, up: boolean) {
         let pt: Point = null;
 
-        if (end) {
+        if (up) {
             ev.preventDefault();
-            pt = this.touchLastPos;
+            pt = this.pointLastTouchMove;
         }
         else {
             let t = ev.touches[0];
@@ -266,16 +275,13 @@ export class CheckerPanel {
                 pt = new Point(t.clientX, t.clientY);
         }
 
-        console.log(`onTouch${end ? 'End' : 'Start'} clientX=${pt?.x} clientY=${pt?.y}`, ev);
-
-        //touch start and end are all treated as mouse click : allow drag & drop.
-        this.onClick(pt);
-
+        console.log(`onTouch${up ? 'End' : 'Start'} clientX=${pt?.x} clientY=${pt?.y}`, ev);
+        this.onClick(pt, up);
     }
 
     private onTouchCancel(ev: TouchEvent) {
         console.log('onTouchCancel', ev);
-        this.touchLastPos = null
+        this.pointLastTouchMove = null
     }
 
     private onTouchMove(ev: TouchEvent) {
@@ -283,7 +289,7 @@ export class CheckerPanel {
         ev.preventDefault();
 
         let t = ev.touches[0];
-        this.touchLastPos = t ? new Point(t.clientX, t.clientY) : null;
+        this.pointLastTouchMove = t ? new Point(t.clientX, t.clientY) : null;
     }
 
 
