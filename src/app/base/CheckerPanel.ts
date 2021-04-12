@@ -13,6 +13,16 @@ enum Bitmap {
     White = 'White'
 }
 
+class Point {
+    x: number;
+    y: number;
+    constructor(x: number, y: number) {
+        this.x = x;
+        this.y = y;
+    }
+}
+
+
 
 export class CheckerPanel {
     public onGetValidMoves: (selected: Pos) => Pos[];
@@ -29,6 +39,7 @@ export class CheckerPanel {
     private ctxBack: CanvasRenderingContext2D;
     private XMAG: number;
     private YMAG: number;
+    private touchLastPos: Point = null;
 
     private bitmaps = {};
 
@@ -42,8 +53,12 @@ export class CheckerPanel {
         if (!this.canvasGame.getContext)
             throw 'Browser does not support Canvas';
 
-        this.canvasGame.onmousedown = (ev: MouseEvent) => { this.onMouseUpDown(ev, false) };
-        this.canvasGame.onmouseup = (ev: MouseEvent) => { this.onMouseUpDown(ev, true) };
+        this.canvasGame.onmousedown = (ev: MouseEvent) => this.onMouseUpDown(ev, false);
+        this.canvasGame.onmouseup = (ev: MouseEvent) => this.onMouseUpDown(ev, true);
+        this.canvasGame.ontouchstart = (ev: TouchEvent) => this.onTouchStartEnd(ev, false);
+        this.canvasGame.ontouchend = (ev: TouchEvent) => this.onTouchStartEnd(ev, true);
+        this.canvasGame.ontouchmove = (ev: TouchEvent) => this.onTouchMove(ev);
+        this.canvasGame.ontouchcancel = (ev: TouchEvent) => this.onTouchCancel(ev);
 
         this.ctxBack = this.canvasBack.getContext('2d', { alpha: false });
         this.ctxGame = this.canvasGame.getContext('2d', { alpha: true });
@@ -113,7 +128,7 @@ export class CheckerPanel {
         this.drawSquare(this.imgWolf, this.gameState.wolf.x, this.gameState.wolf.y);
 
         let selectSheep = !this.gameState.isWolf && this.isPlayEnabled && this.selectedPiece === null;
-        
+
         for (let ps of this.gameState.sheep) {
             this.drawSquare(this.imgSheep, ps.x, ps.y);
 
@@ -211,15 +226,18 @@ export class CheckerPanel {
     }
 
     private onMouseUpDown(ev: MouseEvent, up: boolean) {
-        const rect = this.canvasGame.getBoundingClientRect();
-        console.log(`onmouse${up ? 'up' : 'down'}  x=${ev.x} y=${ev.y} clientX=${ev.clientX} clientY=${ev.clientY} BouncingRect [top:${rect.top} left:${rect.left} width:${rect.width} height:${rect.height}]`);
+        console.log(`onmouse${up ? 'up' : 'down'}  clientX=${ev.clientX} clientY=${ev.clientY}`); // BouncingRect [top:${rect.top} left:${rect.left} width:${rect.width} height:${rect.height}]`);
 
         //mpuse up and down are all treated as mouse click : allow drag & drop.
-        this.onMouseClick((ev.clientX - rect.left) * 10 / rect.width | 0, (ev.clientY - rect.top) * 10 / rect.height | 0);
+        this.onClick(new Point(ev.clientX, ev.clientY));
     };
 
-    private onMouseClick(x: number, y: number) {
-        console.log(`canvas_MouseClick - x=${x} y=${y} selected=${this.selectedPiece}`);
+    private onClick(pt: Point) {
+        const rect = this.canvasGame.getBoundingClientRect();
+        let x = (pt.x - rect.left) * 10 / rect.width | 0;
+        let y = (pt.y - rect.top) * 10 / rect.height | 0;
+
+        console.log(`onClick - x=${x} y=${y} selected=${this.selectedPiece}`);
 
         if (!this.isPlayEnabled)
             return;
@@ -234,5 +252,41 @@ export class CheckerPanel {
         else if (this.selectedPiece !== null && this.isMoveValid(p) && this.onMovePiece)
             this.onMovePiece(this.selectedPiece, p);
     }
+
+    private onTouchStartEnd(ev: TouchEvent, end: boolean) {
+        let pt: Point = null;
+
+        if (end) {
+            ev.preventDefault();
+            pt = this.touchLastPos;
+        }
+        else {
+            let t = ev.touches[0];
+            if (t)
+                pt = new Point(t.clientX, t.clientY);
+        }
+
+        console.log(`onTouch${end ? 'End' : 'Start'} clientX=${pt?.x} clientY=${pt?.y}`, ev);
+
+        //touch start and end are all treated as mouse click : allow drag & drop.
+        this.onClick(pt);
+
+    }
+
+    private onTouchCancel(ev: TouchEvent) {
+        console.log('onTouchCancel', ev);
+        this.touchLastPos = null
+    }
+
+    private onTouchMove(ev: TouchEvent) {
+        console.log('onTouchMove', ev);
+        ev.preventDefault();
+
+        let t = ev.touches[0];
+        this.touchLastPos = t ? new Point(t.clientX, t.clientY) : null;
+    }
+
+
+
 }
 
