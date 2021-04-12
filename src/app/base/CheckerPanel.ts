@@ -263,7 +263,7 @@ export class CheckerPanel {
                 return;
         } else {
             this.posLastClickDown = p;
-            this.pointLastDrag = pt;
+            this.pointLastDrag = new Point(x + 0.5, y + 0.5);
         }
 
         if (!this.gameState.isWolf && this.isSheep(p))
@@ -309,9 +309,9 @@ export class CheckerPanel {
         let pt = this.getPoint(t.clientX, t.clientY);
         this.pointLastDrag = pt;
 
-        //this.drawSquare(this.imgSheep, pt.x - 0.5, pt.y - 0.5);
+        this.ctxGame.clearRect((prev.x - 0.5) * this.XMAG | 0, (prev.y - 0.5) * this.YMAG | 0, this.XMAG, this.YMAG);
+        this.drawSquare(this.imgSheep, pt.x - 0.5, pt.y - 0.5);
     }
-
 
 
 }
