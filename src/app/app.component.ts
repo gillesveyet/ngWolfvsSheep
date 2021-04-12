@@ -280,6 +280,10 @@ export class AppComponent {
         dialogRef.afterClosed().subscribe(result => {
             console.log(`NewGame dialog result:`, result);
 
+            //set focus on canvas to remove focus from "New Game" button (would appear greyed otherwise).
+            //note that canvas is not focusable by default, I needed to add "tabindex=0"
+            this.canvasGame.nativeElement.focus();
+
             if (result) {
                 let r: NewGameResult = result;
                 this.cpuLevel = r.cpuLevel;
