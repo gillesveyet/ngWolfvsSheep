@@ -256,23 +256,26 @@ export class CheckerPanel {
         console.log(`onClick - x=${x} y=${y} selected=${this.selectedPiece}`);
 
         if (!this.isPlayEnabled)
-            return false;
+            return;
 
         if (!Pos.isValid(x, y))
-            return false;
+            return;
 
         let p = Pos.getPos(x, y);
 
-        this.posStartDrag = p;
+        let gs = this.gameState;
 
-        if (!this.gameState.isWolf && this.isSheep(p))
+        if (gs.isWolf && p.equals(gs.wolf)) {
+            this.posStartDrag = p;
+        }
+        else if (!gs.isWolf && this.isSheep(p)) {
+            this.posStartDrag = p;
             this.updateSelected(p, true);
-        else if (this.selectedPiece !== null && this.isMoveValid(p) && this.onMovePiece)
+        }
+        else if (this.selectedPiece !== null && this.isMoveValid(p) && this.onMovePiece) {
             this.onMovePiece(this.selectedPiece, p);
-
-        return true;
+        }
     }
-
 
     private onEndDrag() {
         console.log(`onEndDrag - start;${this.posStartDrag} - end:${this.posEndDrag} selected=${this.selectedPiece}`);
