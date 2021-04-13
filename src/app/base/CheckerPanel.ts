@@ -47,6 +47,7 @@ export class CheckerPanel {
     private XMAG: number;
     private YMAG: number;
     private posStartDrag: Pos = null;   // if null drag is not allowed.
+    private posEndDrag: Pos;
     private pointLastDrag: Point = null;
 
     private bitmaps = {};
@@ -64,8 +65,8 @@ export class CheckerPanel {
         this.canvasGame.onmousedown = (ev: MouseEvent) => this.onMouseUpDown(ev, false);
         this.canvasGame.onmouseup = (ev: MouseEvent) => this.onMouseUpDown(ev, true);
         this.canvasGame.onmousemove = (ev: MouseEvent) => this.onMouseMove(ev);
-        this.canvasGame.ontouchstart = (ev: TouchEvent) => this.onTouchStartEnd(ev, false);
-        this.canvasGame.ontouchend = (ev: TouchEvent) => this.onTouchStartEnd(ev, true);
+        this.canvasGame.ontouchstart = (ev: TouchEvent) => this.onTouchStart(ev);
+        this.canvasGame.ontouchend = (ev: TouchEvent) => this.onTouchEnd(ev);
         this.canvasGame.ontouchmove = (ev: TouchEvent) => this.onTouchMove(ev);
         this.canvasGame.ontouchcancel = (ev: TouchEvent) => this.onTouchCancel(ev);
 
@@ -244,17 +245,10 @@ export class CheckerPanel {
         return new Point(x, y);
     }
 
-    private onClick(pt: Point, up: boolean) {
-        let clean = !!this.posStartDrag;
-
-        if (!this.onClick_(pt, up) && clean)
-            this.onPaint(); //clean drag drop
-    }
-
-
-    private onClick_(pt: Point, up: boolean): boolean {
-        let posStart = this.posStartDrag;
+    private onClick(pt: Point) {
         this.posStartDrag = null;
+        this.posEndDrag = null;
+        this.pointLastDrag = null;
 
         let x = Math.round(pt.x) | 0;
         let y = Math.round(pt.y) | 0;
@@ -269,21 +263,35 @@ export class CheckerPanel {
 
         let p = Pos.getPos(x, y);
 
-        if (up) {
-            if (p.equals(posStart))
-                return false;
-        } else {
-            this.posStartDrag = p;
-            this.pointLastDrag = null;
-        }
+        this.posStartDrag = p;
 
-        if (!up && !this.gameState.isWolf && this.isSheep(p))
+        if (!this.gameState.isWolf && this.isSheep(p))
             this.updateSelected(p, true);
         else if (this.selectedPiece !== null && this.isMoveValid(p) && this.onMovePiece)
             this.onMovePiece(this.selectedPiece, p);
 
         return true;
     }
+
+
+    private onEndDrag() {
+        console.log(`onEndDrag - start;${this.posStartDrag} - end:${this.posEndDrag} selected=${this.selectedPiece}`);
+
+        let p = this.posEndDrag;
+        let posStart = this.posStartDrag;
+
+        this.posStartDrag = null;
+        this.posEndDrag = null;
+
+        if (!p || p.equals(posStart)) {
+            this.onPaint(); //clean drag drop
+            return;
+        }
+
+        if (this.selectedPiece !== null && this.onMovePiece)
+            this.onMovePiece(this.selectedPiece, p);
+    }
+
 
     private onMove(pt: Point) {
 
@@ -312,6 +320,8 @@ export class CheckerPanel {
         let y = start.y + ys * d;
         let moveOk = d >= 0.5;
 
+        this.posEndDrag = moveOk ? move : null;
+
         if (!move)
             return;
 
@@ -329,7 +339,11 @@ export class CheckerPanel {
 
     private onMouseUpDown(ev: MouseEvent, up: boolean) {
         console.log(`onmouse${up ? 'up' : 'down'}  clientX=${ev.clientX} clientY=${ev.clientY}`); // BouncingRect [top:${rect.top} left:${rect.left} width:${rect.width} height:${rect.height}]`);
-        this.onClick(this.getPoint(ev.clientX, ev.clientY), up);
+
+        if (up)
+            this.onEndDrag();
+        else
+            this.onClick(this.getPoint(ev.clientX, ev.clientY));
     }
 
     private onMouseMove(ev: MouseEvent) {
@@ -338,29 +352,23 @@ export class CheckerPanel {
         this.onMove(pt);
     }
 
-    private onTouchStartEnd(ev: TouchEvent, up: boolean) {
-        let pt: Point = null;
+    private onTouchStart(ev: TouchEvent) {
+        let t = ev.touches[0];
+        console.log(`onTouchStart clientX=${t.clientX} clientY=${t.clientY}`, ev);
+        this.onClick(this.getPoint(t.clientX, t.clientY));
+    }
 
-        if (up) {
-            ev.preventDefault();
-            pt = this.pointLastDrag;
-
-            if (!pt)
-                return;
-        }
-        else {
-            let t = ev.touches[0];
-            pt = this.getPoint(t.clientX, t.clientY);
-        }
-
-        console.log(`onTouch${up ? 'End' : 'Start'} clientX=${pt?.x} clientY=${pt?.y}`, ev);
-        this.onClick(pt, up);
+    private onTouchEnd(ev: TouchEvent) {
+        console.log(`onTouchEnd`, ev);
+        ev.preventDefault();    // prevent mouse click event
+        this.onEndDrag();
     }
 
     private onTouchCancel(ev: TouchEvent) {
         console.log('onTouchCancel', ev);
         this.posStartDrag = null;
-        this.onPaint(); //clean drag drop
+        this.posEndDrag = null;
+        this.onEndDrag();
     }
 
 
