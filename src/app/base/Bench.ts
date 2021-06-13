@@ -1,13 +1,14 @@
 import { Solver } from './Solver';
 import { detect } from 'detect-browser';
 import { GameState, GameStatus } from './GameState';
+import { Helper } from './Helper';
 
 export class Bench {
     static run(win: Window, settings: { wolfDepth: number, sheepDepth: number }): void {
         win.document.write('<p>Benchmark running. Please wait.</p>');
 
         let browser = detect();
-        let res = `${new Date().toISOString()} sheepDepth:${settings.sheepDepth} wolfDepth:${settings.wolfDepth} ${browser.name} ${browser.version}`;
+        let res = `${new Date().toISOString()} sheepDepth:${settings.sheepDepth} wolfDepth:${settings.wolfDepth} ${browser?.name} ${browser?.version}`;
         res += '<br>';
 
         let tsTotal = 0;
@@ -35,9 +36,6 @@ export class Bench {
         }
 
         res += `Done in ${tsTotal} ms - Max=${tsMax} ms - nbTotal=${nbTotal} - nbPlay=${nbPlay} - nbFound=${nbFound} - ${GameStatus[gs.status]} ${gs.status === GameStatus.SheepWon ? 'OK' : 'FAIL'}`;
-
-        if (!win)
-            win = window.open('', 'Benchmark');
 
         win.document.write(`<p style='font-family:Courier New;'>` + res + `</p>`);
     }

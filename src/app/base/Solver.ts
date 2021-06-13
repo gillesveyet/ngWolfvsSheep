@@ -1,6 +1,7 @@
 import { GameNode } from './GameNode';
 import { MIN_SCORE, MAX_SCORE } from './GameBase';
 import { GameState, IGameState } from './GameState';
+import { Helper } from './Helper';
 
 //References: 
 // Negamax with alpha beta pruning and transposition tables : https://en.wikipedia.org/wiki/Negamax#Negamax_with_alpha_beta_pruning_and_transposition_tables
@@ -33,7 +34,7 @@ class Transposition {
 export class Solver {
     private maxDepth: number;
     private mapTranspositions: Map<number, Transposition>[];
-    private bestGame: GameNode;
+    private bestGame: GameNode | null;
 
     public elapsed: number;
     public nbIterations: number;
@@ -58,13 +59,13 @@ export class Solver {
 
         let score = this.negaMax(GameNode.fromIGameState(gsParent), 0, MIN_SCORE, MAX_SCORE);
 
-        let gs: GameNode = this.bestGame;
+        let gs: GameNode = Helper.safeCheck<GameNode>(this.bestGame, 'bestGame');
         score = gs.makeTrueScore(score);
 
         this.elapsed = Math.round(performance.now() - start);
         this.statusString = `${gs.nbMoves.toString().padStart(2)}: ${gs.playerId} score:${score.toString().padStart(5)} wolf:${gs.wolf} sheep:${gs.sheep} nb:${this.nbIterations.toString().padStart(6)} nbPlay:${this.nbPlay.toString().padStart(6)} nbFound:${this.nbFound.toString().padStart(6)} time:${this.elapsed.toString().padStart(4)}`;
 
-        this.mapTranspositions = null;  // free memory
+        this.mapTranspositions = [];  // free memory
 
         console.log(this.statusString, gs);
         return GameState.fromGameBase(gs);
@@ -184,4 +185,4 @@ export class Solver {
         this.mapTranspositions[lookupIndex].set(lookupHash, new Transposition(value, flag));
         return value;
     }
-} 
+}

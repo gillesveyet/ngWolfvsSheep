@@ -52,10 +52,10 @@ export class NewGameComponent {
     }
 
     onCancel() {
-        this.onClose(null);
+        this.onClose();
     }
 
-    onClose(result: NewGameResult) {
+    onClose(result?: NewGameResult) {
         if( this.showCpuLevel)
             console.log(`cpuLevel:${this.cpuLevel}`);
 

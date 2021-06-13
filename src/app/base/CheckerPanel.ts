@@ -1,6 +1,7 @@
 ﻿import { Pos } from './Pos';
 import { Observable } from 'rxjs';
 import { GameState } from './GameState';
+import { Helper } from './Helper';
 
 enum Color {
     LightGray,
@@ -35,10 +36,10 @@ export class CheckerPanel {
     public onGetValidMoves: (selected: Pos) => Pos[];
     public onMovePiece: (oldPos: Pos, newPos: Pos) => void;
 
-    private gameState: GameState;
+    private gameState: GameState | null;
     private isPlayEnabled: boolean;
-    private selectedPiece: Pos = null;
-    private validMoves: Pos[] = null;
+    private selectedPiece: Pos | null = null;
+    private validMoves: Pos[] | null = null;
 
     private canvasGame: HTMLCanvasElement
     private canvasBack: HTMLCanvasElement
@@ -46,9 +47,9 @@ export class CheckerPanel {
     private ctxBack: CanvasRenderingContext2D;
     private XMAG: number;
     private YMAG: number;
-    private posStartDrag: Pos = null;   // if null drag is not allowed.
-    private posEndDrag: Pos;
-    private pointLastDrag: Point = null;
+    private posStartDrag: Pos | null = null;   // if null drag is not allowed.
+    private posEndDrag: Pos | null;
+    private pointLastDrag: Point | null = null;
 
     private bitmaps = {};
 
@@ -59,9 +60,6 @@ export class CheckerPanel {
         this.canvasBack = canvasBack;
         this.canvasGame = canvasGame;
 
-        if (!this.canvasGame.getContext)
-            throw 'Browser does not support Canvas';
-
         this.canvasGame.onmousedown = (ev: MouseEvent) => this.onMouseUpDown(ev, false);
         this.canvasGame.onmouseup = (ev: MouseEvent) => this.onMouseUpDown(ev, true);
         this.canvasGame.onmousemove = (ev: MouseEvent) => this.onMouseMove(ev);
@@ -70,8 +68,8 @@ export class CheckerPanel {
         this.canvasGame.ontouchmove = (ev: TouchEvent) => this.onTouchMove(ev);
         this.canvasGame.ontouchcancel = (ev: TouchEvent) => this.onTouchCancel(ev);
 
-        this.ctxBack = this.canvasBack.getContext('2d', { alpha: false });
-        this.ctxGame = this.canvasGame.getContext('2d', { alpha: true });
+        this.ctxBack = Helper.safeCheck(this.canvasBack.getContext('2d', { alpha: false }), 'getContext-canvasBack');
+        this.ctxGame = Helper.safeCheck(this.canvasGame.getContext('2d', { alpha: true }), 'getContext-canvasGame');
         this.XMAG = this.canvasGame.width / 10;
         this.YMAG = this.canvasGame.height / 10;
 
@@ -100,7 +98,7 @@ export class CheckerPanel {
 
 
 
-    setPositions(gs: GameState, enablePlay: boolean): void {
+    setPositions(gs: GameState | null, enablePlay: boolean): void {
         this.selectedPiece = null;
         this.validMoves = null;
 
@@ -215,7 +213,7 @@ export class CheckerPanel {
     }
 
     private isSheep(selected: Pos): boolean {
-        for (let p of this.gameState.sheep) {
+        for (let p of this.gameState!.sheep) {
             if (p.equals(selected))
                 return true;
         }
@@ -263,7 +261,7 @@ export class CheckerPanel {
 
         let p = Pos.getPos(x, y);
 
-        let gs = this.gameState;
+        let gs:GameState = Helper.safeCheck(this.gameState, 'onClick.gameState');
 
         if (gs.isWolf && p.equals(gs.wolf)) {
             this.posStartDrag = p;
@@ -301,8 +299,8 @@ export class CheckerPanel {
         if (!this.posStartDrag || this.validMoves === null)
             return;
 
-        let move: Pos = null;
-        let xs, ys: number;
+        let move: Pos | null = null;
+        let xs = 0, ys = 0;
 
         let start = this.posStartDrag;
 
@@ -335,7 +333,7 @@ export class CheckerPanel {
 
         this.ctxGame.clearRect((prev.x) * this.XMAG | 0, (prev.y) * this.YMAG | 0, this.XMAG, this.YMAG);
         this.drawSelected(move, moveOk ? Color.Fuchsia : Color.Aqua);
-        this.drawSquare(this.gameState.isWolf ? this.imgWolf : this.imgSheep, x, y);
+        this.drawSquare(this.gameState!.isWolf ? this.imgWolf : this.imgSheep, x, y);
 
         this.pointLastDrag = new Point(x, y);
     }

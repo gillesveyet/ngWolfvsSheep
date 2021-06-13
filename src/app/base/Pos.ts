@@ -70,7 +70,7 @@ export class Pos {
     // 	return this.pval - other.pval;
     // }
 
-    equals(other: Pos): boolean {
+    equals(other: Pos|null): boolean {
         return this.pval === other?.pval;
     }
 

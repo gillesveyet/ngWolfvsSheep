@@ -11,6 +11,7 @@ import { EndGameComponent, EndGameDialogData } from './views/end-game/end-game.c
 import { GameState, GameStatus } from './base/GameState';
 import { SwUpdate } from '@angular/service-worker';
 import packageInfo from '../../package.json';
+import { Helper } from './base/Helper';
 
 enum Autoplay {
     Off,
@@ -82,7 +83,7 @@ export class AppComponent {
             console.log(`Update available current:${e.current} available:${e.available}`);
         });
 
-        console.log( `Version: ${packageInfo.version}`);
+        console.log(`Version: ${packageInfo.version}`);
     }
 
     ngOnInit() {
@@ -100,11 +101,11 @@ export class AppComponent {
         this.checker = new CheckerPanel(this.canvasBack.nativeElement, this.canvasGame.nativeElement);
 
         this.checker.onGetValidMoves = (selected: Pos) => {
-            return this.getGS().getValidMoves(selected);
+            return this.getGS()!.getValidMoves(selected);
         };
 
         this.checker.onMovePiece = (oldPos: Pos, newPos: Pos) => {
-            let gs = this.getGS().makePlayerMove(oldPos, newPos);
+            let gs = this.getGS()!.makePlayerMove(oldPos, newPos);
             this.addGS(gs);
             this.checker.setPositions(gs, this.isTwoPlayerMode && !gs.isGameOver);
 
@@ -136,7 +137,7 @@ export class AppComponent {
     cpuPlay() {
         this.busy = true;
         //let gs = this.solver.play(this.getGS(), this.getGS().isWolf ? this.settings.wolfDepth : this.settings.sheepDepth);
-        let data = { gameState: this.getGS(), maxDepth: this.getGS().isWolf ? this.settings.wolfDepth : this.settings.sheepDepth };
+        let data = { gameState: this.getGS(), maxDepth: this.getGS()!.isWolf ? this.settings.wolfDepth : this.settings.sheepDepth };
         this.workerSolver.postMessage(data);
     }
 
@@ -168,7 +169,7 @@ export class AppComponent {
             if (this.autoplay === Autoplay.Pausing) {
                 this.autoplay = Autoplay.Paused;
                 let gs = this.getGS();
-                this.checker.setPositions(gs, !gs.isGameOver);
+                this.checker.setPositions(gs, !gs!.isGameOver);
                 this.displayInfo();
                 return;
             }
@@ -217,13 +218,13 @@ export class AppComponent {
         return this.playerMode === PlayerMode.TwoPlayers;
     }
 
-    getGS(): GameState {
+    getGS(): GameState | null {
         return this.gameHistory.length > 0 ? this.gameHistory[this.gameHistory.length - 1] : null;
     }
 
     get isGameOver(): boolean {
         let gs = this.getGS();
-        return gs && gs.isGameOver;
+        return !!gs && gs.isGameOver;
     }
 
     addGS(gs: GameState) {
@@ -260,7 +261,7 @@ export class AppComponent {
 
     onGameBack() {
         // if player won (computer did not play so playerMode does not match latest game state) => remove single mpve.
-        if (this.isTwoPlayerMode || (this.playerMode === PlayerMode.PlayWolf) !== this.getGS().isWolf) {
+        if (this.isTwoPlayerMode || (this.playerMode === PlayerMode.PlayWolf) !== this.getGS()!.isWolf) {
             this.gameHistory.pop();
         }
         else {
@@ -301,9 +302,9 @@ export class AppComponent {
         //from http://en.nisi.ro/blog/development/javascript/open-new-window-window-open-seen-chrome-popup/
         //Open the window just after onClick event so that Chrome consider that it is not a popup (which are blocked by default on Chrome)
         //Chrome Settings / Advanced Settings / Content Settings : Do not allow any site to show popups - Manage exceptions
-        let wnd = window.open('', 'Benchmark');
+        let win = Helper.safeCheck(window.open('', 'Benchmark'), 'window.open-Benchmark');
         this.busy = true;
-        Bench.run(wnd, this.settings);
+        Bench.run(win, this.settings);
         this.busy = false;
     }
 
@@ -334,13 +335,13 @@ export class AppComponent {
             if (this.playerMode === PlayerMode.None) {
                 this.playerMode = PlayerMode.TwoPlayers;
                 //this.autoplay = Autoplay.Paused;
-            } else if (this.playerMode === PlayerMode.PlayWolf && !gs.isWolf || this.playerMode === PlayerMode.PlaySheep && gs.isWolf) {
+            } else if (this.playerMode === PlayerMode.PlayWolf && !gs!.isWolf || this.playerMode === PlayerMode.PlaySheep && gs!.isWolf) {
                 // Current player mode does not match save game so remove last move.
                 this.gameHistory.pop();
                 gs = this.getGS();
             }
 
-            this.checker.setPositions(gs, !gs.isGameOver);
+            this.checker.setPositions(gs, !gs!.isGameOver);
             this.displayInfo();
         }
 
