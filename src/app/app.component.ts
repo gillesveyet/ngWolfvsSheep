@@ -10,7 +10,7 @@ import { NewGameComponent, NewGameData, NewGameResult } from './views/new-game/n
 import { EndGameComponent, EndGameDialogData } from './views/end-game/end-game.component';
 import { GameState, GameStatus } from './base/GameState';
 import { SwUpdate } from '@angular/service-worker';
-import { version as appVersion } from '../../package.json';
+import packageInfo from '../../package.json';
 
 enum Autoplay {
     Off,
@@ -82,7 +82,7 @@ export class AppComponent {
             console.log(`Update available current:${e.current} available:${e.available}`);
         });
 
-        console.log( `Version: ${appVersion}`);
+        console.log( `Version: ${packageInfo.version}`);
     }
 
     ngOnInit() {
