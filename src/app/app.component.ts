@@ -34,7 +34,7 @@ export class AppComponent {
     autoplayDelay = 150;    // delay in ms.
     settings = { wolfDepth: 0, sheepDepth: 0 };
 
-    readonly workerSolver = new Worker('./base/Solver.worker', { type: 'module' });
+    readonly workerSolver = new Worker(new URL('./base/Solver.worker', import.meta.url), { type: 'module' });
     checker: CheckerPanel;
     gameHistory: GameState[] = [];
     busy = false;
